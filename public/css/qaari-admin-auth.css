@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@500;600;700&display=swap');
+
+:root {
+    --qaari-cream: #f7f4ee;
+    --qaari-cream-deep: #efeae1;
+    --qaari-forest: #1b3a2e;
+    --qaari-forest-soft: #244d3b;
+    --qaari-gold: #c9a24b;
+    --qaari-ink: #1a2416;
+    --qaari-muted: #6b6252;
+    --qaari-card: #fefcf8;
+    --qaari-border: rgba(27, 58, 46, 0.1);
+}
+
+/* Calm full-page shell */
+.fi-simple-layout {
+    min-height: 100dvh;
+    background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201, 162, 75, 0.12), transparent 55%),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(27, 58, 46, 0.06), transparent 50%),
+        var(--qaari-cream) !important;
+    font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+.fi-simple-main-ctn {
+    padding-block: 2.5rem !important;
+}
+
+.fi-simple-main {
+    background: var(--qaari-card) !important;
+    border: 1px solid var(--qaari-border) !important;
+    border-radius: 1.25rem !important;
+    box-shadow:
+        0 1px 2px rgba(26, 36, 22, 0.04),
+        0 12px 40px rgba(26, 36, 22, 0.06) !important;
+    padding: 2.25rem 2rem !important;
+    max-width: 26rem !important;
+}
+
+.fi-simple-header {
+    margin-bottom: 1.75rem !important;
+    gap: 1rem !important;
+    text-align: center;
+}
+
+.fi-logo {
+    height: 4.25rem !important;
+    width: auto !important;
+    margin-inline: auto;
+    display: block;
+}
+
+.fi-simple-header-heading {
+    font-family: 'Playfair Display', Georgia, serif !important;
+    font-weight: 600 !important;
+    font-size: 1.75rem !important;
+    letter-spacing: -0.02em;
+    color: var(--qaari-ink) !important;
+    margin-top: 0.25rem !important;
+}
+
+.fi-simple-header-subheading {
+    color: var(--qaari-muted) !important;
+    font-size: 0.9375rem !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+    margin-top: 0.35rem !important;
+}
+
+/* Form polish */
+.fi-simple-main .fi-fo-field-wrp-label span,
+.fi-simple-main .fi-fo-field-wrp-label {
+    color: var(--qaari-ink) !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+}
+
+.fi-simple-main .fi-input,
+.fi-simple-main input[type='email'],
+.fi-simple-main input[type='password'],
+.fi-simple-main input[type='text'] {
+    border-radius: 0.75rem !important;
+    background-color: var(--qaari-cream) !important;
+    border-color: var(--qaari-border) !important;
+    color: var(--qaari-ink) !important;
+    min-height: 2.75rem;
+}
+
+.fi-simple-main .fi-input:focus,
+.fi-simple-main input:focus {
+    border-color: var(--qaari-gold) !important;
+    box-shadow: 0 0 0 3px rgba(201, 162, 75, 0.2) !important;
+}
+
+.fi-simple-main .fi-btn.fi-color-primary {
+    border-radius: 0.75rem !important;
+    min-height: 2.85rem;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em;
+    background-color: var(--qaari-forest) !important;
+    color: #f7f4ee !important;
+    box-shadow: none !important;
+}
+
+.fi-simple-main .fi-btn.fi-color-primary:hover {
+    background-color: var(--qaari-forest-soft) !important;
+    color: #f7f4ee !important;
+}
+
+/* Quiet local autofill */
+.qaari-demo-login {
+    margin-top: 1.25rem;
+    padding-top: 1.15rem;
+    border-top: 1px solid var(--qaari-border);
+    text-align: center;
+}
+
+.qaari-demo-login__hint {
+    margin: 0 0 0.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--qaari-muted);
+}
+
+.qaari-demo-login__btn {
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--qaari-border);
+    border-radius: 999px;
+    color: var(--qaari-forest);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    padding: 0.45rem 1rem;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.qaari-demo-login__btn:hover {
+    background: var(--qaari-cream-deep);
+    border-color: rgba(27, 58, 46, 0.22);
+}
+
+@media (max-width: 480px) {
+    .fi-simple-main {
+        padding: 1.75rem 1.25rem !important;
+        border-radius: 1rem !important;
+    }
+
+    .fi-simple-header-heading {
+        font-size: 1.5rem !important;
+    }
+}
