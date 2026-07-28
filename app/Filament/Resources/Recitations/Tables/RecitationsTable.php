@@ -7,8 +7,11 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class RecitationsTable
 {
@@ -57,13 +60,44 @@ class RecitationsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('id', 'desc')
+            ->paginated([10, 25, 50])
+            ->defaultPaginationPageOption(10)
+            ->extremePaginationLinks()
+            ->deferLoading()
             ->filters([
                 SelectFilter::make('reciter_id')
                     ->label('Reciter')
                     ->relationship('reciter', 'name_english')
                     ->searchable()
                     ->preload(),
-            ])
+                SelectFilter::make('surah_id')
+                    ->label('Surah')
+                    ->relationship(
+                        name: 'surah',
+                        titleAttribute: 'name_english',
+                        modifyQueryUsing: fn ($query) => $query->orderBy('number'),
+                    )
+                    ->getOptionLabelFromRecordUsing(
+                        fn ($record) => sprintf('%d. %s', $record->number, $record->name_english),
+                    )
+                    ->searchable()
+                    ->preload(),
+                TernaryFilter::make('has_audio')
+                    ->label('Audio file')
+                    ->placeholder('All')
+                    ->trueLabel('Has audio')
+                    ->falseLabel('Missing audio')
+                    ->queries(
+                        true: fn (Builder $query) => $query->whereNotNull('audio_url')->where('audio_url', '!=', ''),
+                        false: fn (Builder $query) => $query->where(function (Builder $query): void {
+                            $query->whereNull('audio_url')->orWhere('audio_url', '');
+                        }),
+                    ),
+            ], layout: FiltersLayout::AboveContentCollapsible)
+            ->filtersFormColumns(3)
+            ->persistFiltersInSession()
+            ->persistSearchInSession()
+            ->recordActionsColumnLabel('Actions')
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make(),

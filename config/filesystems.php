@@ -58,7 +58,6 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
             'throw' => true,
             'report' => false,
-            'visibility' => 'private',
         ],
 
         // Alias used in app code: Storage::disk('r2')
@@ -73,7 +72,6 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
             'throw' => true,
             'report' => false,
-            'visibility' => 'private',
         ],
 
     ],

@@ -278,7 +278,11 @@ body.fi-body,
     color: var(--qaari-fg) !important;
 }
 
-.fi-ta-header-cell {
+.fi-ta-header-cell,
+.fi-ta-actions-header-cell,
+.fi-ta-empty-header-cell,
+.fi-ta-header-group-cell,
+.fi-ta-table > thead .fi-ta-selection-cell {
     background: var(--qaari-header) !important;
     color: var(--qaari-primary) !important;
     font-size: 0.75rem !important;
@@ -291,6 +295,22 @@ body.fi-body,
 .fi-ta-filters,
 .fi-ta-content {
     background: var(--qaari-card) !important;
+}
+
+.fi-ta-filters-above-content-ctn {
+    background: var(--qaari-card) !important;
+    border: 1px solid var(--qaari-border) !important;
+    border-radius: 1rem !important;
+    margin-bottom: 0.75rem;
+    padding: 0.85rem 1rem !important;
+}
+
+.fi-ta-filters-heading {
+    color: var(--qaari-primary) !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .fi-pagination,

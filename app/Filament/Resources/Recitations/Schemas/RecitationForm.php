@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources\Recitations\Schemas;
 
+use App\Support\AudioMetadata;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Facades\Storage;
 
 class RecitationForm
 {
@@ -57,30 +57,18 @@ class RecitationForm
                                 'audio/ogg',
                             ])
                             ->maxSize(204800)
-                            ->visibility('private')
                             ->required()
                             ->downloadable()
                             ->openable()
                             ->afterStateUpdated(function ($state, callable $set): void {
-                                if (blank($state) || is_array($state)) {
-                                    return;
-                                }
+                                $meta = AudioMetadata::fromUpload($state, 'r2');
 
-                                if (Storage::disk('r2')->exists($state)) {
-                                    $set('file_size', Storage::disk('r2')->size($state));
-                                }
+                                $set('duration', $meta['duration']);
+                                $set('file_size', $meta['file_size']);
                             })
                             ->columnSpanFull(),
-                        TextInput::make('duration')
-                            ->label('Duration (seconds)')
-                            ->numeric()
-                            ->minValue(1)
-                            ->helperText('Optional for now — can be filled later.'),
-                        TextInput::make('file_size')
-                            ->label('File size (bytes)')
-                            ->numeric()
-                            ->readOnly()
-                            ->dehydrated(),
+                        Hidden::make('duration')->dehydrated(),
+                        Hidden::make('file_size')->dehydrated(),
                     ]),
             ]);
     }

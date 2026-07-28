@@ -15,21 +15,23 @@ class ReciterForm
         return $schema
             ->components([
                 Section::make('Names')
-                    ->columns(3)
                     ->schema([
                         TextInput::make('name_somali')
                             ->label('Somali')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->columnSpanFull(),
                         TextInput::make('name_arabic')
                             ->label('Arabic')
                             ->required()
                             ->maxLength(255)
-                            ->extraInputAttributes(['dir' => 'rtl']),
+                            ->extraInputAttributes(['dir' => 'rtl'])
+                            ->columnSpanFull(),
                         TextInput::make('name_english')
                             ->label('English')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->columnSpanFull(),
                     ]),
                 Section::make('Bios')
                     ->schema([
@@ -57,7 +59,6 @@ class ReciterForm
                             ->image()
                             ->imageEditor()
                             ->maxSize(5120)
-                            ->visibility('private')
                             ->columnSpanFull(),
                         TextInput::make('region')
                             ->label('Region')
