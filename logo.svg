@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Qaari SL logo">
+  <defs>
+    <radialGradient id="bgGrad" cx="42%" cy="36%" r="72%">
+      <stop offset="0%" stop-color="#244D3B"/>
+      <stop offset="100%" stop-color="#0A1C11"/>
+    </radialGradient>
+    <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#C9A24B" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#C9A24B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background circle with gradient -->
+  <circle cx="100" cy="100" r="99" fill="url(#bgGrad)"/>
+
+  <!-- Subtle inner glow -->
+  <circle cx="100" cy="100" r="80" fill="url(#glowGrad)"/>
+
+  <!-- Outer gold ring -->
+  <circle cx="100" cy="100" r="97" fill="none" stroke="#C9A24B" stroke-width="1.8"/>
+
+  <!-- Second ring (inner decorative) -->
+  <circle cx="100" cy="100" r="86" fill="none" stroke="#C9A24B" stroke-width="0.6" opacity="0.35"/>
+
+  <!-- 8-pointed geometric star — filled subtle -->
+  <polygon
+    points="100,35 115,63 146,54 137,85 165,100 137,115 146,146 115,137 100,165 85,137 54,146 63,115 35,100 63,85 54,54 85,63"
+    fill="#C9A24B"
+    opacity="0.10"
+  />
+
+  <!-- 8-pointed geometric star — stroke outline -->
+  <polygon
+    points="100,35 115,63 146,54 137,85 165,100 137,115 146,146 115,137 100,165 85,137 54,146 63,115 35,100 63,85 54,54 85,63"
+    fill="none"
+    stroke="#C9A24B"
+    stroke-width="1.1"
+    opacity="0.50"
+  />
+
+  <!-- Inner circle frame -->
+  <circle cx="100" cy="100" r="42" fill="none" stroke="#C9A24B" stroke-width="0.8" opacity="0.45"/>
+
+  <!-- Central Arabic letter ق (Qaf — first letter of Qaari/قارئ) -->
+  <text
+    x="100"
+    y="119"
+    font-family="'Amiri', 'Scheherazade New', 'Times New Roman', serif"
+    font-size="64"
+    fill="#C9A24B"
+    text-anchor="middle"
+    font-weight="400"
+  >ق</text>
+
+  <!-- Cardinal point ornaments -->
+  <circle cx="100" cy="26" r="3" fill="#C9A24B"/>
+  <circle cx="174" cy="100" r="3" fill="#C9A24B"/>
+  <circle cx="100" cy="174" r="3" fill="#C9A24B"/>
+  <circle cx="26" cy="100" r="3" fill="#C9A24B"/>
+
+  <!-- Diagonal ornament dots (at 45° star tips) -->
+  <circle cx="148" cy="52" r="2" fill="#C9A24B" opacity="0.65"/>
+  <circle cx="148" cy="148" r="2" fill="#C9A24B" opacity="0.65"/>
+  <circle cx="52" cy="148" r="2" fill="#C9A24B" opacity="0.65"/>
+  <circle cx="52" cy="52" r="2" fill="#C9A24B" opacity="0.65"/>
+</svg>
