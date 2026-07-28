@@ -1,0 +1,387 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@500;600;700&display=swap');
+
+/* Exact tokens from Website Design Ref */
+:root {
+    --qaari-bg: #f7f4ee;
+    --qaari-fg: #1a2416;
+    --qaari-card: #fefcf8;
+    --qaari-primary: #1b3a2e;
+    --qaari-primary-fg: #f7f4ee;
+    --qaari-secondary: #e8efe9;
+    --qaari-muted: #d9e5de;
+    --qaari-muted-fg: #6b6252;
+    --qaari-accent: #c9a24b;
+    --qaari-accent-fg: #1a2416;
+    --qaari-danger: #c0392b;
+    --qaari-border: rgba(27, 58, 46, 0.12);
+    --qaari-input: #eef3f0;
+    --qaari-sidebar: #f0ede6;
+    --qaari-sidebar-accent: #ede9e0;
+    --qaari-ring: #4a7a62;
+    --qaari-soft: #2e5e48;
+    --qaari-header: #e3ece7;
+    --qaari-radius: 0.75rem;
+}
+
+body.fi-body,
+.fi-body {
+    font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif !important;
+    color: var(--qaari-fg);
+    background: var(--qaari-bg);
+}
+
+/* ========== Login ========== */
+.fi-simple-layout {
+    min-height: 100dvh;
+    background:
+        radial-gradient(ellipse 70% 45% at 50% 0%, rgba(201, 162, 75, 0.1), transparent 55%),
+        var(--qaari-bg) !important;
+}
+
+.fi-simple-main-ctn {
+    padding-block: 2.5rem !important;
+}
+
+.fi-simple-main {
+    background: var(--qaari-card) !important;
+    border: 1px solid var(--qaari-border) !important;
+    border-radius: 1rem !important;
+    box-shadow: 0 1px 2px rgba(26, 36, 22, 0.04) !important;
+    padding: 2.25rem 2rem !important;
+    max-width: 26rem !important;
+}
+
+.fi-simple-header {
+    margin-bottom: 1.75rem !important;
+    gap: 1rem !important;
+    text-align: center;
+}
+
+.fi-simple-layout .fi-logo {
+    height: 4.25rem !important;
+    width: auto !important;
+    margin-inline: auto;
+    display: block;
+}
+
+.fi-simple-header-heading {
+    font-family: 'Playfair Display', Georgia, serif !important;
+    font-weight: 600 !important;
+    font-size: 1.75rem !important;
+    letter-spacing: -0.02em;
+    color: var(--qaari-fg) !important;
+}
+
+.fi-simple-header-subheading {
+    color: var(--qaari-muted-fg) !important;
+    font-size: 0.9375rem !important;
+}
+
+.fi-simple-main .fi-input,
+.fi-simple-main input[type='email'],
+.fi-simple-main input[type='password'],
+.fi-simple-main input[type='text'] {
+    border-radius: var(--qaari-radius) !important;
+    background-color: var(--qaari-input) !important;
+    border-color: var(--qaari-border) !important;
+    color: var(--qaari-fg) !important;
+    min-height: 2.75rem;
+}
+
+.fi-simple-main .fi-input:focus,
+.fi-simple-main input:focus {
+    border-color: var(--qaari-soft) !important;
+    box-shadow: 0 0 0 3px rgba(46, 94, 72, 0.2) !important;
+}
+
+.fi-simple-main .fi-btn.fi-color-primary {
+    border-radius: var(--qaari-radius) !important;
+    min-height: 2.85rem;
+    font-weight: 600 !important;
+    background-color: var(--qaari-primary) !important;
+    color: var(--qaari-primary-fg) !important;
+    box-shadow: none !important;
+}
+
+.fi-simple-main .fi-btn.fi-color-primary:hover {
+    background-color: var(--qaari-soft) !important;
+}
+
+.qaari-demo-login {
+    margin-top: 1.25rem;
+    padding-top: 1.15rem;
+    border-top: 1px solid var(--qaari-border);
+    text-align: center;
+}
+
+.qaari-demo-login__hint {
+    margin: 0 0 0.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--qaari-muted-fg);
+}
+
+.qaari-demo-login__btn {
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--qaari-border);
+    border-radius: 999px;
+    color: var(--qaari-primary);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    padding: 0.45rem 1rem;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.qaari-demo-login__btn:hover {
+    background: var(--qaari-secondary);
+    border-color: rgba(27, 58, 46, 0.2);
+}
+
+/* ========== App shell ========== */
+.fi-main-ctn,
+.fi-main {
+    background: var(--qaari-bg) !important;
+}
+
+.fi-topbar {
+    background: var(--qaari-primary) !important;
+    border-bottom: 1px solid rgba(201, 162, 75, 0.22) !important;
+    box-shadow: none !important;
+}
+
+.fi-topbar,
+.fi-topbar .fi-topbar-item-label,
+.fi-topbar .fi-icon-btn,
+.fi-topbar button,
+.fi-topbar a {
+    color: var(--qaari-primary-fg) !important;
+}
+
+.fi-topbar .fi-icon-btn:hover {
+    background: rgba(247, 244, 238, 0.1) !important;
+    color: var(--qaari-accent) !important;
+}
+
+.fi-topbar .fi-avatar,
+.fi-topbar .fi-user-menu-trigger {
+    color: var(--qaari-primary-fg) !important;
+}
+
+.fi-sidebar {
+    background: var(--qaari-primary) !important;
+    border-inline-end: 1px solid rgba(201, 162, 75, 0.18) !important;
+}
+
+.fi-sidebar-header {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(201, 162, 75, 0.22) !important;
+    padding-block: 1rem !important;
+}
+
+.fi-sidebar .fi-logo {
+    height: 2.35rem !important;
+    width: auto !important;
+}
+
+.fi-sidebar-nav {
+    padding-top: 0.75rem !important;
+}
+
+.fi-sidebar-group-label {
+    color: rgba(247, 244, 238, 0.5) !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    font-weight: 600 !important;
+}
+
+.fi-sidebar-item-btn {
+    border-radius: var(--qaari-radius) !important;
+    color: #f7f4ee !important;
+}
+
+.fi-sidebar-item-btn:hover {
+    background: rgba(247, 244, 238, 0.12) !important;
+    color: #f7f4ee !important;
+}
+
+.fi-sidebar-item-label {
+    color: #f7f4ee !important;
+    opacity: 1 !important;
+}
+
+.fi-sidebar-item-icon,
+.fi-sidebar-item-btn .fi-icon,
+.fi-sidebar-item-btn svg {
+    color: var(--qaari-accent) !important;
+    opacity: 1 !important;
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn,
+.fi-sidebar-item-btn[aria-current='page'] {
+    background: rgba(201, 162, 75, 0.22) !important;
+    color: #f7f4ee !important;
+    box-shadow: inset 3px 0 0 var(--qaari-accent);
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-icon,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn svg {
+    color: #f7f4ee !important;
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-icon,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn svg {
+    color: var(--qaari-accent) !important;
+}
+
+/* Collapse / open sidebar controls in sidebar */
+.fi-sidebar .fi-icon-btn {
+    color: rgba(247, 244, 238, 0.75) !important;
+}
+
+.fi-sidebar .fi-icon-btn:hover {
+    background: rgba(247, 244, 238, 0.1) !important;
+    color: var(--qaari-accent) !important;
+}
+
+/* Page headings */
+.fi-header-heading {
+    font-family: 'Playfair Display', Georgia, serif !important;
+    font-weight: 600 !important;
+    color: var(--qaari-fg) !important;
+    letter-spacing: -0.02em;
+}
+
+.fi-header-subheading {
+    color: var(--qaari-muted-fg) !important;
+}
+
+/* Cards / sections / tables */
+.fi-section,
+.fi-ta-ctn,
+.fi-wi-stats-overview-stat {
+    background: var(--qaari-card) !important;
+    border: 1px solid var(--qaari-border) !important;
+    border-radius: 1rem !important;
+    box-shadow: none !important;
+}
+
+.fi-section-header-heading {
+    font-weight: 600 !important;
+    color: var(--qaari-fg) !important;
+}
+
+.fi-ta-header-cell,
+.fi-ta-actions-header-cell,
+.fi-ta-empty-header-cell,
+.fi-ta-header-group-cell,
+.fi-ta-table > thead .fi-ta-selection-cell {
+    background: var(--qaari-header) !important;
+    color: var(--qaari-primary) !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.fi-ta-header-toolbar,
+.fi-ta-filters,
+.fi-ta-content {
+    background: var(--qaari-card) !important;
+}
+
+.fi-ta-filters-above-content-ctn {
+    background: var(--qaari-card) !important;
+    border: 1px solid var(--qaari-border) !important;
+    border-radius: 1rem !important;
+    margin-bottom: 0.75rem;
+    padding: 0.85rem 1rem !important;
+}
+
+.fi-ta-filters-heading {
+    color: var(--qaari-primary) !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.fi-pagination,
+.fi-pagination-item {
+    color: var(--qaari-primary) !important;
+}
+
+.fi-ta-row {
+    border-color: var(--qaari-border) !important;
+}
+
+.fi-ta-row:hover {
+    background: var(--qaari-bg) !important;
+}
+
+/* Inputs */
+.fi-input,
+.fi-select-input,
+textarea.fi-textarea {
+    border-radius: var(--qaari-radius) !important;
+    background-color: var(--qaari-input) !important;
+    border-color: var(--qaari-border) !important;
+    color: var(--qaari-fg) !important;
+}
+
+.fi-input:focus,
+.fi-select-input:focus,
+textarea.fi-textarea:focus {
+    border-color: var(--qaari-soft) !important;
+    box-shadow: 0 0 0 3px rgba(46, 94, 72, 0.18) !important;
+}
+
+.fi-btn {
+    border-radius: var(--qaari-radius) !important;
+    font-weight: 600 !important;
+}
+
+.fi-btn.fi-color-primary {
+    background-color: var(--qaari-primary) !important;
+    color: var(--qaari-primary-fg) !important;
+    box-shadow: none !important;
+}
+
+.fi-btn.fi-color-primary:hover {
+    background-color: var(--qaari-soft) !important;
+    color: var(--qaari-primary-fg) !important;
+}
+
+.fi-btn.fi-color-danger {
+    background-color: var(--qaari-danger) !important;
+    color: #ffffff !important;
+}
+
+/* Stats */
+.fi-wi-stats-overview-stat-value {
+    font-family: 'Playfair Display', Georgia, serif !important;
+    font-weight: 600 !important;
+    color: var(--qaari-primary) !important;
+}
+
+.fi-wi-stats-overview-stat-label,
+.fi-wi-stats-overview-stat-description {
+    color: var(--qaari-muted-fg) !important;
+}
+
+@media (max-width: 480px) {
+    .fi-simple-main {
+        padding: 1.75rem 1.25rem !important;
+    }
+
+    .fi-simple-header-heading {
+        font-size: 1.5rem !important;
+    }
+}
