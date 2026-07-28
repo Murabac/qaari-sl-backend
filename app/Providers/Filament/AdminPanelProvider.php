@@ -3,16 +3,16 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\Login;
+use App\Filament\Pages\Dashboard;
+use App\Filament\Widgets\ContentStatsOverview;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
-use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -36,11 +36,18 @@ class AdminPanelProvider extends PanelProvider
             )
             ->brandName('Qaari SL')
             ->brandLogo(asset('images/logo.svg'))
-            ->brandLogoHeight('4.25rem')
+            ->brandLogoHeight('2.35rem')
+            ->favicon(asset('images/logo.svg'))
             ->colors([
                 'primary' => Color::hex('#1B3A2E'),
+                'warning' => Color::hex('#4A7A62'),
+                'success' => Color::hex('#2E5E48'),
+                'danger' => Color::hex('#c0392b'),
+                'info' => Color::hex('#4A7A62'),
                 'gray' => Color::Stone,
             ])
+            ->sidebarCollapsibleOnDesktop()
+            ->sidebarWidth('17.5rem')
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
                 fn (): string => view('filament.auth.auth-styles')->render(),
@@ -56,7 +63,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                AccountWidget::class,
+                ContentStatsOverview::class,
             ])
             ->middleware([
                 EncryptCookies::class,
