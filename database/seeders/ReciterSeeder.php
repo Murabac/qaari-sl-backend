@@ -14,9 +14,9 @@ class ReciterSeeder extends Seeder
                 'name_somali' => 'Sheekh Cabdiraxmaan Xaaji',
                 'name_arabic' => 'الشيخ عبد الرحمن حاجي',
                 'name_english' => 'Sheikh Abdirahman Haji',
-                'bio_somali' => 'Qaari caan ah oo ka soo jeeda Hargeysa, Somaliland. Wuxuu ku caan baxay qiraatkiisa quruxda badan ee Qur\'aanka Kariimka.',
-                'bio_arabic' => 'قارئ مشهور من هرجيسا، صوماليلاند. يُعرف بتلاوته الجميلة للقرآن الكريم.',
-                'bio_english' => 'A well-known reciter from Hargeisa, Somaliland, recognized for his beautiful Quranic recitation.',
+                'bio_somali' => 'Qaari caan ah oo ka soo jeeda Hargeysa. Wuxuu ku caan baxay qiraatkiisa quruxda badan ee Qur\'aanka Kariimka.',
+                'bio_arabic' => 'قارئ مشهور من هرجيسا. يُعرف بتلاوته الجميلة للقرآن الكريم.',
+                'bio_english' => 'A well-known reciter from Hargeisa, recognized for his beautiful Quranic recitation.',
                 'region' => 'Hargeisa',
             ],
             [

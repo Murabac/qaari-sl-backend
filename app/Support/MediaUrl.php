@@ -13,6 +13,10 @@ class MediaUrl
             return null;
         }
 
+        if (str_starts_with($path, 'images/') || str_starts_with($path, '/images/')) {
+            return asset(ltrim($path, '/'));
+        }
+
         try {
             return Storage::disk($disk)->temporaryUrl($path, now()->addMinutes($minutes));
         } catch (Throwable) {

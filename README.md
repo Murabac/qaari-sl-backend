@@ -1,24 +1,28 @@
 # Qaari SL Backend
 
-Laravel 12 API + Filament admin for the Qaari SL Quran reciters platform.
+Laravel 12 API + Filament admin + public Blade website for the Qaari SL Quran reciters platform.
 
 ## Stack
 
 - Laravel 12, Filament 5, Spatie Permission, Laravel Sanctum
+- Blade + Vite + Tailwind CSS 4 + Alpine.js (public site)
 - MySQL / MariaDB, Cloudflare R2 (S3-compatible) for audio and photos
 
 ## Local setup
 
 ```bash
 composer install
+npm install
 cp .env.example .env
 php artisan key:generate
 # Configure DB + R2 in .env
 php artisan migrate --seed
+npm run build          # or: npm run dev
 php artisan serve --host=127.0.0.1
 ```
 
-Admin panel: `http://127.0.0.1:8000/admin`
+- Public website: `http://127.0.0.1:8000/`
+- Admin panel: `http://127.0.0.1:8000/admin`
 
 Seeded staff (password: `password`):
 
@@ -27,6 +31,20 @@ Seeded staff (password: `password`):
 | admin@qaarisl.com | Super Admin |
 | reviewer@qaarisl.com | Admin |
 | production@qaarisl.com | Production |
+
+## Public website
+
+| Path | Page |
+|------|------|
+| `/` | Homepage (hero, featured reciters, stats, partners) |
+| `/reciters` | Reciter list (search + region filter) |
+| `/reciters/{id}` | Reciter detail + approved recordings |
+| `/story` | The Story So Far (patrons, leadership, team) |
+| `/locale/{en\|so\|ar}` | Language switch (session + RTL for Arabic) |
+
+Approved recitations only. Sticky bottom player uses temporary R2 audio URLs.
+
+**Super Admin only (Filament → Story Page):** hero/closing copy, patrons & leadership, Behind the Voices team, partners list, and the homepage partners on/off toggle.
 
 ## Public API (`/api/v1`)
 

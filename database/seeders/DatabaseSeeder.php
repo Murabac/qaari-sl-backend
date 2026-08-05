@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             SurahSeeder::class,
             RoleSeeder::class,
             ReciterSeeder::class,
+            StoryLeaderSeeder::class,
         ]);
     }
 }
