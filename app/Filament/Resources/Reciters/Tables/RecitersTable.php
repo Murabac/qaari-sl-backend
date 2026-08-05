@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Reciters\Tables;
 
+use App\Filament\Resources\Reciters\ReciterResource;
 use App\Models\Reciter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -43,7 +44,10 @@ class RecitersTable
                     ->sortable(),
                 TextColumn::make('recitations_count')
                     ->counts('recitations')
-                    ->label('Recitations'),
+                    ->label('Surahs')
+                    ->formatStateUsing(fn (?int $state): string => sprintf('%d / 114', $state ?? 0))
+                    ->url(fn (Reciter $record): string => ReciterResource::getUrl('edit', ['record' => $record]))
+                    ->color('primary'),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

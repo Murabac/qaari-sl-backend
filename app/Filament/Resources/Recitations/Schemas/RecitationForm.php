@@ -2,12 +2,18 @@
 
 namespace App\Filament\Resources\Recitations\Schemas;
 
+use App\Enums\RecitationStatus;
+use App\Models\Recitation;
+use App\Models\User;
 use App\Support\AudioMetadata;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\ViewField;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 
 class RecitationForm
 {
@@ -18,9 +24,28 @@ class RecitationForm
                 Section::make('Recitation')
                     ->columns(2)
                     ->schema([
+                        Placeholder::make('status_display')
+                            ->label('Status')
+                            ->content(function (?Recitation $record): string {
+                                return $record?->status?->label() ?? RecitationStatus::Draft->label();
+                            })
+                            ->visible(fn (?Recitation $record): bool => $record !== null),
                         Select::make('reciter_id')
                             ->label('Reciter')
-                            ->relationship('reciter', 'name_english')
+                            ->relationship(
+                                name: 'reciter',
+                                titleAttribute: 'name_english',
+                                modifyQueryUsing: function (Builder $query): Builder {
+                                    /** @var User|null $user */
+                                    $user = auth()->user();
+
+                                    if ($user?->isProduction() && ! $user->isReviewer()) {
+                                        $query->where('created_by', $user->id);
+                                    }
+
+                                    return $query->orderBy('name_english');
+                                },
+                            )
                             ->searchable()
                             ->preload()
                             ->required(),
@@ -41,6 +66,7 @@ class RecitationForm
                             )
                             ->searchable(['number', 'name_english', 'name_arabic', 'name_somali'])
                             ->preload()
+                            ->optionsLimit(114)
                             ->required(),
                         FileUpload::make('audio_url')
                             ->label('Audio file')
@@ -69,6 +95,18 @@ class RecitationForm
                             ->columnSpanFull(),
                         Hidden::make('duration')->dehydrated(),
                         Hidden::make('file_size')->dehydrated(),
+                    ]),
+                Section::make('Review notes')
+                    ->visible(fn (?Recitation $record): bool => ($record?->reviewNotes()?->exists()) ?? false)
+                    ->schema([
+                        ViewField::make('review_notes_panel')
+                            ->label('')
+                            ->view('filament.forms.review-notes')
+                            ->viewData(fn (?Recitation $record): array => [
+                                'notes' => $record?->reviewNotes()->with('user')->get() ?? collect(),
+                            ])
+                            ->dehydrated(false)
+                            ->columnSpanFull(),
                     ]),
             ]);
     }

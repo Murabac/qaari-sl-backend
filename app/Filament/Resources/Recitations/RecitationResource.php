@@ -8,11 +8,14 @@ use App\Filament\Resources\Recitations\Pages\ListRecitations;
 use App\Filament\Resources\Recitations\Schemas\RecitationForm;
 use App\Filament\Resources\Recitations\Tables\RecitationsTable;
 use App\Models\Recitation;
+use App\Models\User;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 class RecitationResource extends Resource
@@ -35,6 +38,20 @@ class RecitationResource extends Resource
         return RecitationsTable::configure($table);
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        $query = parent::getEloquentQuery();
+
+        if ($user?->isProduction() && ! $user->isReviewer()) {
+            $query->where('created_by', $user->id);
+        }
+
+        return $query;
+    }
+
     public static function getRelations(): array
     {
         return [];
@@ -47,5 +64,25 @@ class RecitationResource extends Resource
             'create' => CreateRecitation::route('/create'),
             'edit' => EditRecitation::route('/{record}/edit'),
         ];
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('viewAny', Recitation::class) ?? false;
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create', Recitation::class) ?? false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()?->can('update', $record) ?? false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()?->can('delete', $record) ?? false;
     }
 }
