@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Recitations\Tables;
 
+use App\Enums\RecitationStatus;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -9,9 +10,9 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Livewire\Component;
 
 class RecitationsTable
 {
@@ -29,6 +30,11 @@ class RecitationsTable
                 TextColumn::make('surah.name_english')
                     ->label('Surah')
                     ->searchable()
+                    ->sortable(),
+                TextColumn::make('status')
+                    ->badge()
+                    ->formatStateUsing(fn (RecitationStatus $state): string => $state->label())
+                    ->color(fn (RecitationStatus $state): string => $state->color())
                     ->sortable(),
                 TextColumn::make('duration')
                     ->label('Duration')
@@ -53,15 +59,26 @@ class RecitationsTable
 
                         return number_format($state / 1024, 1).' KB';
                     })
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->emptyStateHeading('Choose a reciter')
+            ->modifyQueryUsing(function (Builder $query, Component $livewire): Builder {
+                $reciterId = $livewire->getTableFilterState('reciter_id')['value'] ?? null;
+
+                if (blank($reciterId)) {
+                    return $query->whereRaw('0 = 1');
+                }
+
+                return $query;
+            })
             ->defaultSort('id', 'desc')
             ->paginated([10, 25, 50])
-            ->defaultPaginationPageOption(10)
+            ->defaultPaginationPageOption(25)
             ->extremePaginationLinks()
             ->deferLoading()
             ->filters([
@@ -82,18 +99,9 @@ class RecitationsTable
                     )
                     ->searchable()
                     ->preload(),
-                TernaryFilter::make('has_audio')
-                    ->label('Audio file')
-                    ->placeholder('All')
-                    ->trueLabel('Has audio')
-                    ->falseLabel('Missing audio')
-                    ->queries(
-                        true: fn (Builder $query) => $query->whereNotNull('audio_url')->where('audio_url', '!=', ''),
-                        false: fn (Builder $query) => $query->where(function (Builder $query): void {
-                            $query->whereNull('audio_url')->orWhere('audio_url', '');
-                        }),
-                    ),
-            ], layout: FiltersLayout::AboveContentCollapsible)
+                SelectFilter::make('status')
+                    ->options(RecitationStatus::options()),
+            ], layout: FiltersLayout::AboveContent)
             ->filtersFormColumns(3)
             ->persistFiltersInSession()
             ->persistSearchInSession()
