@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\RecitationStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -72,6 +73,11 @@ class Recitation extends Model
     public function playlistItems(): HasMany
     {
         return $this->hasMany(PlaylistItem::class);
+    }
+
+    public function scopeApproved(Builder $query): Builder
+    {
+        return $query->where('status', RecitationStatus::Approved);
     }
 
     public function isOwnedBy(?User $user): bool
