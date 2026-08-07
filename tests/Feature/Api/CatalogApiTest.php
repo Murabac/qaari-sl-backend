@@ -81,6 +81,53 @@ class CatalogApiTest extends TestCase
         $this->getJson('/api/v1/recitations/'.$draft->id)->assertNotFound();
     }
 
+    public function test_follow_along_returns_ayahs_and_starts_for_approved(): void
+    {
+        $surah = $this->makeSurah(['number' => 112, 'verse_count' => 2]);
+        \App\Models\Ayah::query()->create([
+            'surah_id' => $surah->id,
+            'number' => 1,
+            'text_uthmani' => 'قُلْ',
+        ]);
+        \App\Models\Ayah::query()->create([
+            'surah_id' => $surah->id,
+            'number' => 2,
+            'text_uthmani' => 'ٱللَّهُ',
+        ]);
+
+        $recitation = $this->makeRecitation(surah: $surah, status: RecitationStatus::Approved, overrides: [
+            'duration' => 20,
+        ]);
+
+        \App\Models\RecitationAyahTiming::query()->create([
+            'recitation_id' => $recitation->id,
+            'ayah_number' => 1,
+            'start_ms' => 0,
+            'end_ms' => 8000,
+        ]);
+        \App\Models\RecitationAyahTiming::query()->create([
+            'recitation_id' => $recitation->id,
+            'ayah_number' => 2,
+            'start_ms' => 8000,
+            'end_ms' => 20000,
+        ]);
+
+        $this->getJson('/api/v1/recitations/'.$recitation->id.'/follow-along')
+            ->assertOk()
+            ->assertJsonPath('data.recitation.id', $recitation->id)
+            ->assertJsonCount(2, 'data.ayahs')
+            ->assertJsonPath('data.ayahs.0.text_uthmani', 'قُلْ')
+            ->assertJsonPath('data.ayah_starts.0', 0)
+            ->assertJsonPath('data.ayah_starts.1', 8);
+    }
+
+    public function test_follow_along_hides_non_approved(): void
+    {
+        $draft = $this->makeRecitation(status: RecitationStatus::Draft);
+
+        $this->getJson('/api/v1/recitations/'.$draft->id.'/follow-along')->assertNotFound();
+    }
+
     public function test_search_returns_matching_catalog(): void
     {
         $reciter = $this->makeReciter(['name_english' => 'Abdullah Hargeisa']);
