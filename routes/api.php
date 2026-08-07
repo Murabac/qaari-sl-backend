@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\PlaylistController;
 use App\Http\Controllers\Api\V1\RecitationController;
 use App\Http\Controllers\Api\V1\ReciterController;
 use App\Http\Controllers\Api\V1\SearchController;
+use App\Http\Controllers\Api\V1\StoryController;
 use App\Http\Controllers\Api\V1\SurahController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,9 +18,11 @@ Route::prefix('v1')->group(function (): void {
     Route::get('surahs/{surah}', [SurahController::class, 'show']);
 
     Route::get('recitations', [RecitationController::class, 'index']);
+    Route::get('recitations/{recitation}/follow-along', [RecitationController::class, 'followAlong']);
     Route::get('recitations/{recitation}', [RecitationController::class, 'show']);
 
     Route::get('search', SearchController::class);
+    Route::get('story', StoryController::class);
 
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login']);
