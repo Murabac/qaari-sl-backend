@@ -32,6 +32,17 @@
             </div>
 
             <div class="qaari-web-player__controls">
+                <button
+                    type="button"
+                    class="qaari-web-player__skip"
+                    x-on:click="$store.player.playPrevious()"
+                    x-bind:disabled="! $store.player.hasPrevious()"
+                    x-bind:class="{ 'opacity-30 pointer-events-none': ! $store.player.hasPrevious() }"
+                    title="{{ __('site.prev_surah') }}"
+                    aria-label="{{ __('site.prev_surah') }}"
+                >
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                </button>
                 <button type="button" class="qaari-web-player__skip" x-on:click="$store.player.skip(-10)">
                     {{ __('site.skip_back') }}
                 </button>
@@ -46,6 +57,17 @@
                 </button>
                 <button type="button" class="qaari-web-player__skip" x-on:click="$store.player.skip(10)">
                     {{ __('site.skip_forward') }}
+                </button>
+                <button
+                    type="button"
+                    class="qaari-web-player__skip"
+                    x-on:click="$store.player.playNext()"
+                    x-bind:disabled="! $store.player.hasNext()"
+                    x-bind:class="{ 'opacity-30 pointer-events-none': ! $store.player.hasNext() }"
+                    title="{{ __('site.next_surah') }}"
+                    aria-label="{{ __('site.next_surah') }}"
+                >
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 6h2v12h-2zm-3.5 6l-8.5 6V6z"/></svg>
                 </button>
             </div>
 

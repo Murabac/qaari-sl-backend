@@ -42,6 +42,44 @@ class FollowAlongController extends Controller
         $audioUrl = MediaUrl::temporary('r2', $recitation->audio_url);
         $shareUrl = route('follow-along.show', $recitation);
 
+        $reciterName = LocaleText::reciterName($recitation->reciter);
+
+        $siblingRecitations = Recitation::query()
+            ->approved()
+            ->where('reciter_id', $recitation->reciter_id)
+            ->with(['surah', 'ayahTimings'])
+            ->get()
+            ->sortBy(fn (Recitation $item) => $item->surah?->number ?? $item->surah_id)
+            ->values();
+
+        $playerQueue = $siblingRecitations->map(function (Recitation $item) use ($reciterName) {
+            $itemTitle = $item->surah
+                ? (($item->surah->number ?? '').'. '.LocaleText::surahName($item->surah))
+                : __('site.surah');
+
+            $itemAudio = MediaUrl::temporary('r2', $item->audio_url);
+
+            if (! $itemAudio) {
+                return null;
+            }
+
+            return [
+                'id' => $item->id,
+                'title' => $itemTitle,
+                'subtitle' => $reciterName,
+                'src' => $itemAudio,
+                'durationSeconds' => (int) ($item->duration ?? 0),
+                'reciterUrl' => route('reciters.show', $item->reciter_id),
+                'followUrl' => route('follow-along.show', $item),
+                'shareUrl' => route('reciters.show', ['reciter' => $item->reciter_id, 'play' => $item->id]),
+                'verseCount' => (int) ($item->surah->verse_count ?? 0),
+                'ayahStarts' => $item->ayahTimings
+                    ->map(fn ($timing) => round($timing->start_ms / 1000, 3))
+                    ->values()
+                    ->all(),
+            ];
+        })->filter()->values()->all();
+
         return view('follow-along', [
             'recitation' => $recitation,
             'ayahs' => $ayahs,
@@ -49,6 +87,7 @@ class FollowAlongController extends Controller
             'audioUrl' => $audioUrl,
             'title' => $title,
             'shareUrl' => $shareUrl,
+            'playerQueue' => $playerQueue,
             'isFavorite' => $request->user()
                 ? $request->user()->favorites()->where('recitation_id', $recitation->id)->exists()
                 : false,

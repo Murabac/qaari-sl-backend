@@ -31,6 +31,8 @@ return [
     'stats_recitations' => ':count Recitations',
     'skip_back' => '-10s',
     'skip_forward' => '+10s',
+    'prev_surah' => 'Previous surah',
+    'next_surah' => 'Next surah',
     'play' => 'Play',
     'pause' => 'Pause',
     'close_player' => 'Close player',

@@ -2,6 +2,31 @@
 
 @php
     use App\Support\LocaleText;
+
+    $playerQueue = $tracks
+        ->filter(fn (array $track) => filled($track['audio_url'] ?? null))
+        ->map(function (array $track) use ($reciter) {
+            $recitation = $track['recitation'];
+            $surah = $recitation->surah;
+            $title = $surah
+                ? (($surah->number ?? '').'. '.LocaleText::surahName($surah))
+                : __('site.surah');
+
+            return [
+                'id' => $recitation->id,
+                'title' => $title,
+                'subtitle' => LocaleText::reciterName($reciter),
+                'src' => $track['audio_url'],
+                'durationSeconds' => (int) ($recitation->duration ?? 0),
+                'reciterUrl' => route('reciters.show', $reciter),
+                'followUrl' => $track['follow_url'],
+                'shareUrl' => $track['share_url'],
+                'verseCount' => (int) ($surah->verse_count ?? 0),
+                'ayahStarts' => $track['ayah_starts'] ?? [],
+            ];
+        })
+        ->values()
+        ->all();
 @endphp
 
 @section('title', LocaleText::reciterName($reciter).' · '.__('site.footer_brand'))
@@ -103,7 +128,7 @@
                                                 shareUrl: @js($track['share_url']),
                                                 verseCount: {{ (int) ($surah->verse_count ?? 0) }},
                                                 ayahStarts: @js($track['ayah_starts'] ?? []),
-                                            })"
+                                            }, @js($playerQueue))"
                                         @else
                                             disabled
                                         @endif

@@ -25,6 +25,7 @@
         class="bg-qaari-deep px-4 pb-28 pt-28 text-qaari-primary-fg sm:px-6"
         x-data="followAlong(@js([
             'ayahs' => $ayahPayload,
+            'queue' => $playerQueue,
             'autoPlay' => [
                 'id' => $recitation->id,
                 'title' => $title,

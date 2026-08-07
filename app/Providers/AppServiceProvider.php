@@ -11,6 +11,7 @@ use App\Policies\RecitationPolicy;
 use App\Policies\ReciterPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Facades\GenerateSignedUploadUrlFacade;
 
@@ -25,6 +26,10 @@ class AppServiceProvider extends ServiceProvider
     {
         // R2 rejects x-amz-acl on browser uploads; omit ACL from presigned URLs.
         GenerateSignedUploadUrlFacade::swap(new GenerateSignedUploadUrl);
+
+        if (str_starts_with((string) config('app.url'), 'https://')) {
+            URL::forceScheme('https');
+        }
 
         Gate::policy(Reciter::class, ReciterPolicy::class);
         Gate::policy(Recitation::class, RecitationPolicy::class);

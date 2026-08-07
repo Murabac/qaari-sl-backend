@@ -31,6 +31,8 @@ return [
     'stats_recitations' => ':count تلاوة',
     'skip_back' => '-١٠ ث',
     'skip_forward' => '+١٠ ث',
+    'prev_surah' => 'السورة السابقة',
+    'next_surah' => 'السورة التالية',
     'play' => 'تشغيل',
     'pause' => 'إيقاف',
     'close_player' => 'إغلاق المشغل',

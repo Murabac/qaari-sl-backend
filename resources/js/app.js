@@ -1,7 +1,52 @@
 import './bootstrap';
+import * as Turbo from '@hotwired/turbo';
 import Alpine from 'alpinejs';
 
 const STORAGE_KEY = 'qaari.player';
+
+function getSharedAudio() {
+    if (!window.__qaariAudio) {
+        window.__qaariAudio = new Audio();
+        window.__qaariAudio.preload = 'metadata';
+    }
+
+    return window.__qaariAudio;
+}
+
+function bindAudioEvents(store, audio) {
+    if (audio.__qaariBound) {
+        return;
+    }
+
+    audio.__qaariBound = true;
+
+    audio.addEventListener('loadedmetadata', () => {
+        store.duration = audio.duration || (store.track?.durationSeconds ?? 0);
+        store.syncAyah();
+    });
+
+    audio.addEventListener('timeupdate', () => {
+        store.current = audio.currentTime || 0;
+        store.syncAyah();
+        store.persist();
+    });
+
+    audio.addEventListener('ended', () => {
+        store.playing = false;
+        store.persist();
+        store.playNext({ auto: true });
+    });
+
+    audio.addEventListener('play', () => {
+        store.playing = true;
+        store.persist();
+    });
+
+    audio.addEventListener('pause', () => {
+        store.playing = false;
+        store.persist();
+    });
+}
 
 Alpine.store('player', {
     open: false,
@@ -9,46 +54,41 @@ Alpine.store('player', {
     current: 0,
     duration: 0,
     track: null,
+    queue: [],
+    queueIndex: -1,
     currentAyah: 0,
     _audio: null,
 
     init() {
-        this._audio = new Audio();
-        this._audio.preload = 'metadata';
-
-        this._audio.addEventListener('loadedmetadata', () => {
-            this.duration = this._audio.duration || (this.track?.durationSeconds ?? 0);
-            this.syncAyah();
-        });
-
-        this._audio.addEventListener('timeupdate', () => {
-            this.current = this._audio.currentTime || 0;
-            this.syncAyah();
-            this.persist();
-        });
-
-        this._audio.addEventListener('ended', () => {
-            this.playing = false;
-            this.persist();
-        });
-
-        this._audio.addEventListener('play', () => {
-            this.playing = true;
-        });
-
-        this._audio.addEventListener('pause', () => {
-            this.playing = false;
-        });
-
+        this._audio = getSharedAudio();
+        bindAudioEvents(this, this._audio);
         this.restore();
     },
 
-    play(track) {
+    setQueue(queue = [], activeId = null) {
+        this.queue = Array.isArray(queue) ? queue.filter((t) => t?.src) : [];
+        this.queueIndex = activeId == null
+            ? -1
+            : this.queue.findIndex((t) => t.id === activeId);
+    },
+
+    play(track, queue = null) {
         if (!track?.src) {
             return;
         }
 
-        const same = this.track?.id === track.id;
+        if (Array.isArray(queue)) {
+            this.setQueue(queue, track.id);
+        } else if (this.queue.length) {
+            const idx = this.queue.findIndex((t) => t.id === track.id);
+            this.queueIndex = idx;
+        } else {
+            this.setQueue([track], track.id);
+        }
+
+        const sameId = this.track?.id === track.id;
+        const currentBase = (this._audio.currentSrc || this._audio.src || '').split('?')[0];
+        const nextBase = String(track.src).split('?')[0];
 
         this.track = {
             id: track.id,
@@ -64,7 +104,7 @@ Alpine.store('player', {
         };
         this.open = true;
 
-        if (!same || this._audio.src !== track.src) {
+        if (!sameId || currentBase !== nextBase || !this._audio.src) {
             this._audio.src = track.src;
             this.current = 0;
             this.currentAyah = 0;
@@ -75,6 +115,73 @@ Alpine.store('player', {
         });
 
         this.persist();
+    },
+
+    ensurePlaying(track, queue = null) {
+        if (!track?.src) {
+            return;
+        }
+
+        if (this.track?.id === track.id) {
+            if (Array.isArray(queue)) {
+                this.setQueue(queue, track.id);
+            }
+
+            this.open = true;
+
+            if (this._audio.paused) {
+                this._audio.play().catch(() => {});
+            }
+
+            this.persist();
+
+            return;
+        }
+
+        this.play(track, queue);
+    },
+
+    hasPrevious() {
+        return this.queueIndex > 0;
+    },
+
+    hasNext() {
+        return this.queueIndex >= 0 && this.queueIndex < this.queue.length - 1;
+    },
+
+    playPrevious() {
+        if (!this.hasPrevious()) {
+            return;
+        }
+
+        this.play(this.queue[this.queueIndex - 1], this.queue);
+        this.syncFollowAlongPage();
+    },
+
+    playNext({ auto = false } = {}) {
+        if (!this.hasNext()) {
+            if (auto) {
+                this.playing = false;
+                this.persist();
+            }
+
+            return;
+        }
+
+        this.play(this.queue[this.queueIndex + 1], this.queue);
+        this.syncFollowAlongPage();
+    },
+
+    syncFollowAlongPage() {
+        const followUrl = this.track?.followUrl;
+
+        if (!followUrl || !window.location.pathname.includes('/listen/')) {
+            return;
+        }
+
+        if (window.Turbo?.visit) {
+            window.Turbo.visit(followUrl, { action: 'replace' });
+        }
     },
 
     toggle() {
@@ -149,7 +256,6 @@ Alpine.store('player', {
         if (starts.length && this.duration) {
             const t = this.current + 0.01;
 
-            // Before the first timed ayah (e.g. during basmala), clear the highlight.
             if (t < (starts[0] ?? 0)) {
                 this.currentAyah = -1;
 
@@ -208,7 +314,7 @@ Alpine.store('player', {
                 return;
             }
         } catch {
-            // user cancelled or share failed — fall through to clipboard
+            // cancelled
         }
 
         try {
@@ -232,6 +338,9 @@ Alpine.store('player', {
                 track: this.track,
                 current: this.current,
                 open: this.open,
+                playing: this.playing && !this._audio?.paused,
+                queue: this.queue,
+                queueIndex: this.queueIndex,
             }),
         );
     },
@@ -250,12 +359,32 @@ Alpine.store('player', {
                 return;
             }
 
+            // Turbo navigations keep the live Audio element — don't interrupt it.
+            if (this._audio.src && !this._audio.paused && this.track?.id === saved.track.id) {
+                this.open = Boolean(saved.open);
+                this.queue = Array.isArray(saved.queue) ? saved.queue : this.queue;
+                this.queueIndex = Number.isInteger(saved.queueIndex) ? saved.queueIndex : this.queueIndex;
+
+                return;
+            }
+
+            if (this._audio.src && this.track?.id) {
+                this.open = Boolean(saved.open ?? this.open);
+                this.queue = Array.isArray(saved.queue) ? saved.queue : this.queue;
+                this.queueIndex = Number.isInteger(saved.queueIndex) ? saved.queueIndex : this.queueIndex;
+
+                return;
+            }
+
             this.track = saved.track;
             this.open = Boolean(saved.open);
+            this.queue = Array.isArray(saved.queue) ? saved.queue : [];
+            this.queueIndex = Number.isInteger(saved.queueIndex) ? saved.queueIndex : -1;
             this._audio.src = saved.track.src;
             this.duration = saved.track.durationSeconds || 0;
 
             const resumeAt = Number(saved.current) || 0;
+            const shouldPlay = Boolean(saved.playing);
 
             this._audio.addEventListener(
                 'loadedmetadata',
@@ -264,6 +393,10 @@ Alpine.store('player', {
                     this.current = resumeAt;
                     this.duration = this._audio.duration || this.duration;
                     this.syncAyah();
+
+                    if (shouldPlay) {
+                        this._audio.play().catch(() => {});
+                    }
                 },
                 { once: true },
             );
@@ -280,7 +413,7 @@ Alpine.data('followAlong', (config) => ({
 
     boot() {
         if (config.autoPlay?.src) {
-            this.$store.player.play(config.autoPlay);
+            this.$store.player.ensurePlaying(config.autoPlay, config.queue || null);
         }
 
         this.$watch(
@@ -313,4 +446,30 @@ Alpine.data('followAlong', (config) => ({
 }));
 
 window.Alpine = Alpine;
-Alpine.start();
+window.Turbo = Turbo;
+
+if (!window.__qaariAlpineStarted) {
+    window.__qaariAlpineStarted = true;
+    Alpine.start();
+}
+
+document.addEventListener('turbo:load', () => {
+    // Re-bind Alpine on newly injected page nodes after Turbo navigations.
+    document.querySelectorAll('[x-data]').forEach((el) => {
+        if (!el._x_dataStack) {
+            Alpine.initTree(el);
+        }
+    });
+});
+
+document.addEventListener('turbo:before-cache', () => {
+    document.querySelectorAll('[x-data]').forEach((el) => {
+        if (el.id === 'qaari-web-player-root') {
+            return;
+        }
+
+        if (el._x_dataStack) {
+            Alpine.destroyTree(el);
+        }
+    });
+});

@@ -31,6 +31,8 @@ return [
     'stats_recitations' => ':count Tilaaweyn',
     'skip_back' => '-10il',
     'skip_forward' => '+10il',
+    'prev_surah' => 'Suuradda hore',
+    'next_surah' => 'Suuradda xigta',
     'play' => 'Ciyaar',
     'pause' => 'Hakad',
     'close_player' => 'Xir ciyaartoyga',

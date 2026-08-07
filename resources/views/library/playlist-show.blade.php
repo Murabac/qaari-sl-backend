@@ -2,6 +2,33 @@
 
 @php
     use App\Support\LocaleText;
+
+    $playerQueue = $tracks
+        ->filter(fn (array $track) => filled($track['audio_url'] ?? null))
+        ->map(function (array $track) {
+            $recitation = $track['recitation'];
+            $surah = $recitation->surah;
+            $reciter = $recitation->reciter;
+            $title = $surah ? (($surah->number ?? '').'. '.LocaleText::surahName($surah)) : __('site.surah');
+            $subtitle = $reciter ? LocaleText::reciterName($reciter) : '';
+
+            return [
+                'id' => $recitation->id,
+                'title' => $title,
+                'subtitle' => $subtitle,
+                'src' => $track['audio_url'],
+                'durationSeconds' => (int) ($recitation->duration ?? 0),
+                'reciterUrl' => $reciter ? route('reciters.show', $reciter) : null,
+                'followUrl' => route('follow-along.show', $recitation),
+                'shareUrl' => $reciter
+                    ? route('reciters.show', ['reciter' => $reciter, 'play' => $recitation->id])
+                    : route('follow-along.show', $recitation),
+                'verseCount' => (int) ($surah->verse_count ?? 0),
+                'ayahStarts' => [],
+            ];
+        })
+        ->values()
+        ->all();
 @endphp
 
 @section('title', $playlist->name.' · '.__('site.footer_brand'))
@@ -65,7 +92,7 @@
                                         followUrl: @js(route('follow-along.show', $recitation)),
                                         shareUrl: @js(route('reciters.show', ['reciter' => $reciter, 'play' => $recitation->id])),
                                         verseCount: {{ (int) ($surah->verse_count ?? 0) }},
-                                    })"
+                                    }, @js($playerQueue))"
                                 @endif
                             >
                                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>

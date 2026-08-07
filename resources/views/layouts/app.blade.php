@@ -18,7 +18,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body
-    class="site-main min-h-screen"
+    class="site-main flex min-h-screen flex-col"
     x-data="{ toast: '' }"
     x-on:qaari-toast.window="toast = '{{ __('site.link_copied') }}'; setTimeout(() => toast = '', 2200)"
     x-bind:class="{ 'has-player': $store.player.open }"
@@ -158,11 +158,11 @@
         <p class="rounded-xl bg-qaari-primary px-4 py-3 text-center text-sm font-semibold text-qaari-primary-fg shadow-lg" x-text="toast"></p>
     </div>
 
-    <main>
+    <main class="flex-1">
         @yield('content')
     </main>
 
-    <footer class="border-t border-qaari-border bg-qaari-primary text-qaari-primary-fg">
+    <footer class="mt-auto border-t border-qaari-border bg-qaari-primary text-qaari-primary-fg">
         <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div class="flex items-center gap-3">
                 <img src="{{ asset('images/logo.svg') }}" alt="" class="h-8 w-8">
@@ -172,7 +172,9 @@
         </div>
     </footer>
 
-    @include('components.audio-player')
+    <div id="qaari-web-player-root" data-turbo-permanent>
+        @include('components.audio-player')
+    </div>
 
     <style>[x-cloak]{display:none!important}</style>
 </body>

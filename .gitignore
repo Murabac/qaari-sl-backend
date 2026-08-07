@@ -3,6 +3,7 @@
 .env
 .env.backup
 .env.production
+/qaari_sl.sql
 .phpactor.json
 .phpunit.result.cache
 /.fleet
