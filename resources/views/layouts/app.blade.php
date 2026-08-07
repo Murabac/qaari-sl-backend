@@ -173,6 +173,10 @@
                 <a href="{{ route('privacy') }}" class="inline-block text-sm font-semibold text-qaari-accent hover:text-qaari-accent-hover">
                     {{ __('site.privacy_policy') }}
                 </a>
+                <span class="mx-2 text-qaari-primary-fg/30">·</span>
+                <a href="{{ route('account-deletion') }}" class="inline-block text-sm font-semibold text-qaari-accent hover:text-qaari-accent-hover">
+                    {{ __('site.account_deletion') }}
+                </a>
             </div>
         </div>
     </footer>

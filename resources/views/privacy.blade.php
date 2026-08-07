@@ -100,7 +100,10 @@
                     <ul class="mt-3 list-disc space-y-2 ps-5">
                         <li>You can use much of the catalog without creating an account</li>
                         <li>You can update or remove favorites and playlists while signed in</li>
-                        <li>You can request account deletion by contacting us</li>
+                        <li>
+                            You can permanently delete your account and associated data at any time:
+                            <a href="{{ route('account-deletion') }}" class="font-semibold text-qaari-primary hover:text-qaari-accent">{{ url('/account-deletion') }}</a>
+                        </li>
                         <li>You can uninstall the mobile app at any time</li>
                     </ul>
                 </section>

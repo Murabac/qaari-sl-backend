@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Web\AccountDeletionController;
 use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\FavoriteController;
 use App\Http\Controllers\Web\FollowAlongController;
@@ -15,6 +16,8 @@ Route::get('/reciters', [ReciterController::class, 'index'])->name('reciters.ind
 Route::get('/reciters/{reciter}', [ReciterController::class, 'show'])->name('reciters.show');
 Route::get('/story', StoryController::class)->name('story');
 Route::view('/privacy', 'privacy')->name('privacy');
+Route::get('/account-deletion', [AccountDeletionController::class, 'show'])->name('account-deletion');
+Route::delete('/account-deletion', [AccountDeletionController::class, 'destroy'])->name('account-deletion.destroy');
 Route::get('/locale/{locale}', LocaleController::class)->name('locale.switch');
 Route::get('/listen/{recitation}', [FollowAlongController::class, 'show'])->name('follow-along.show');
 

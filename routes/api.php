@@ -71,6 +71,7 @@ Route::prefix('v1')->group(function (): void {
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('auth/logout', [AuthController::class, 'logout']);
         Route::get('auth/me', [AuthController::class, 'me']);
+        Route::delete('auth/account', [AuthController::class, 'destroy']);
 
         Route::get('favorites', [FavoriteController::class, 'index']);
         Route::post('favorites', [FavoriteController::class, 'store']);
