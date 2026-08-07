@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\RecitationStatus;
+use App\Enums\SyncStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,11 @@ class Recitation extends Model
         'reviewed_at',
         'reviewed_by',
         'created_by',
+        'sync_status',
+        'synced_at',
+        'sync_error',
+        'sync_method',
+        'manual_sync_ayah',
     ];
 
     protected function casts(): array
@@ -30,9 +36,34 @@ class Recitation extends Model
             'duration' => 'integer',
             'file_size' => 'integer',
             'status' => RecitationStatus::class,
+            'sync_status' => SyncStatus::class,
             'submitted_at' => 'datetime',
             'reviewed_at' => 'datetime',
+            'synced_at' => 'datetime',
+            'manual_sync_ayah' => 'integer',
         ];
+    }
+
+    public function ayahTimings(): HasMany
+    {
+        return $this->hasMany(RecitationAyahTiming::class)->orderBy('ayah_number');
+    }
+
+    public function isTextSynced(): bool
+    {
+        return $this->sync_status === SyncStatus::Synced
+            && $this->ayahTimings()->exists();
+    }
+
+    /**
+     * @return list<float>
+     */
+    public function ayahStartSeconds(): array
+    {
+        return $this->ayahTimings
+            ->map(fn (RecitationAyahTiming $timing): float => $timing->start_ms / 1000)
+            ->values()
+            ->all();
     }
 
     public function reciter(): BelongsTo

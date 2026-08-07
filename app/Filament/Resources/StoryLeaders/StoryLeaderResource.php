@@ -5,10 +5,12 @@ namespace App\Filament\Resources\StoryLeaders;
 use App\Enums\StoryLeaderTier;
 use App\Filament\Resources\StoryLeaders\Pages\ManageStoryLeaders;
 use App\Models\StoryLeader;
+use App\Support\MediaUrl;
 use BackedEnum;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -73,6 +75,21 @@ class StoryLeaderResource extends Resource
                     ->imageEditor()
                     ->avatar()
                     ->maxSize(5120)
+                    ->fetchFileInformation(false)
+                    ->getUploadedFileUsing(function (BaseFileUpload $component, string $file, string|array|null $storedFileNames): ?array {
+                        $url = MediaUrl::temporary('r2', $file);
+
+                        if (blank($url)) {
+                            return null;
+                        }
+
+                        return [
+                            'name' => is_array($storedFileNames) ? ($storedFileNames[$file] ?? basename($file)) : ($storedFileNames ?: basename($file)),
+                            'size' => 0,
+                            'type' => null,
+                            'url' => $url,
+                        ];
+                    })
                     ->columnSpanFull(),
                 Toggle::make('is_active')
                     ->label('Visible on site')
@@ -86,8 +103,10 @@ class StoryLeaderResource extends Resource
             ->columns([
                 ImageColumn::make('photo_url')
                     ->label('Photo')
-                    ->disk('r2')
-                    ->circular(),
+                    ->circular()
+                    ->checkFileExistence(false)
+                    ->getStateUsing(fn (StoryLeader $record): ?string => MediaUrl::temporary('r2', $record->photo_url))
+                    ->defaultImageUrl(asset('images/logo.svg')),
                 TextColumn::make('name')->searchable()->sortable(),
                 TextColumn::make('title')->limit(40),
                 TextColumn::make('tier')

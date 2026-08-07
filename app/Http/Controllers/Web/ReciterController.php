@@ -37,12 +37,13 @@ class ReciterController extends Controller
         ]);
     }
 
-    public function show(Reciter $reciter): View
+    public function show(Request $request, Reciter $reciter): View
     {
         abort_unless($reciter->approvedRecitations()->exists(), 404);
 
         $reciter->load([
             'approvedRecitations.surah',
+            'approvedRecitations.ayahTimings',
         ]);
 
         $reciter->setRelation(
@@ -52,15 +53,38 @@ class ReciterController extends Controller
                 ->values(),
         );
 
+        $favoriteIds = $request->user()
+            ? $request->user()->favorites()
+                ->whereIn('recitation_id', $reciter->approvedRecitations->pluck('id'))
+                ->pluck('recitation_id')
+                ->all()
+            : [];
+
+        $playlists = $request->user()
+            ? $request->user()->playlists()->orderBy('name')->get(['id', 'name'])
+            : collect();
+
         $tracks = $reciter->approvedRecitations->map(fn ($recitation) => [
             'recitation' => $recitation,
             'audio_url' => MediaUrl::temporary('r2', $recitation->audio_url),
+            'is_favorite' => in_array($recitation->id, $favoriteIds, true),
+            'share_url' => route('reciters.show', [
+                'reciter' => $reciter,
+                'play' => $recitation->id,
+            ]),
+            'follow_url' => route('follow-along.show', $recitation),
+            'ayah_starts' => $recitation->ayahTimings
+                ->map(fn ($timing) => round($timing->start_ms / 1000, 3))
+                ->values()
+                ->all(),
         ]);
 
         return view('reciters.show', [
             'reciter' => $reciter,
             'tracks' => $tracks,
             'photoUrl' => MediaUrl::temporary('r2', $reciter->photo_url),
+            'playlists' => $playlists,
+            'autoPlayId' => $request->integer('play') ?: null,
         ]);
     }
 }
