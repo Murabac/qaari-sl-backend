@@ -36,6 +36,12 @@ class RecitationsTable
                     ->formatStateUsing(fn (RecitationStatus $state): string => $state->label())
                     ->color(fn (RecitationStatus $state): string => $state->color())
                     ->sortable(),
+                TextColumn::make('sync_status')
+                    ->label('Text sync')
+                    ->badge()
+                    ->formatStateUsing(fn ($state): string => $state?->label() ?? '—')
+                    ->color(fn ($state): string => $state?->color() ?? 'gray')
+                    ->sortable(),
                 TextColumn::make('duration')
                     ->label('Duration')
                     ->formatStateUsing(function (?int $state): string {

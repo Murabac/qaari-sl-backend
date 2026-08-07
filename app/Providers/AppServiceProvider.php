@@ -6,6 +6,7 @@ use App\Livewire\GenerateSignedUploadUrl;
 use App\Models\Recitation;
 use App\Models\Reciter;
 use App\Models\User;
+use App\Observers\RecitationObserver;
 use App\Policies\RecitationPolicy;
 use App\Policies\ReciterPolicy;
 use App\Policies\UserPolicy;
@@ -28,5 +29,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Reciter::class, ReciterPolicy::class);
         Gate::policy(Recitation::class, RecitationPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
+
+        Recitation::observe(RecitationObserver::class);
     }
 }

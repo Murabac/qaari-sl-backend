@@ -60,6 +60,9 @@
                             src: @js($listenNow['audio_url']),
                             durationSeconds: {{ (int) ($lnRecitation->duration ?? 0) }},
                             reciterUrl: @js(route('reciters.show', $lnReciter)),
+                            followUrl: @js(route('follow-along.show', $lnRecitation)),
+                            shareUrl: @js(route('reciters.show', ['reciter' => $lnReciter, 'play' => $lnRecitation->id])),
+                            verseCount: {{ (int) ($lnRecitation->surah->verse_count ?? 0) }},
                         })"
                     >
                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>

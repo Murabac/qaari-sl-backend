@@ -55,6 +55,19 @@
                 <span x-text="$store.player.format($store.player.duration)"></span>
             </div>
 
+            <a
+                class="hidden rounded-full border border-white/15 px-2.5 py-1 text-[0.65rem] font-semibold text-qaari-accent transition hover:border-qaari-accent sm:inline"
+                x-show="$store.player.track?.followUrl"
+                x-cloak
+                x-bind:href="$store.player.track?.followUrl || '#'"
+            >{{ __('site.follow_along_short') }}</a>
+
+            <button
+                type="button"
+                class="hidden rounded-full border border-white/15 px-2.5 py-1 text-[0.65rem] font-semibold text-white/70 transition hover:border-white/40 hover:text-white sm:inline"
+                x-on:click="$store.player.share()"
+            >{{ __('site.share') }}</button>
+
             <button
                 type="button"
                 class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-white/40 hover:text-white"

@@ -29,6 +29,11 @@ class Surah extends Model
         return $this->hasMany(Recitation::class);
     }
 
+    public function ayahs(): HasMany
+    {
+        return $this->hasMany(Ayah::class)->orderBy('number');
+    }
+
     public function scopeSearch(Builder $query, ?string $term): Builder
     {
         if (blank($term)) {

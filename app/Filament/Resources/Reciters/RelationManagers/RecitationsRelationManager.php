@@ -82,11 +82,23 @@ class RecitationsRelationManager extends RelationManager
                     ->required()
                     ->downloadable()
                     ->openable()
-                    ->afterStateUpdated(function ($state, callable $set): void {
+                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
+                        // Only analyze freshly uploaded temp files — not existing R2 paths on edit hydrate.
+                        if (! ($state instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
+                            && ! (is_array($state) && ($state[0] ?? null) instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
+                        ) {
+                            return;
+                        }
+
                         $meta = AudioMetadata::fromUpload($state, 'r2');
 
-                        $set('duration', $meta['duration']);
-                        $set('file_size', $meta['file_size']);
+                        if ($meta['duration'] !== null) {
+                            $set('duration', $meta['duration']);
+                        }
+
+                        if ($meta['file_size'] !== null) {
+                            $set('file_size', $meta['file_size']);
+                        }
                     })
                     ->columnSpanFull(),
                 Hidden::make('duration')->dehydrated(),
@@ -159,12 +171,21 @@ class RecitationsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->label('Add surah')
+                    ->createAnother(false)
+                    // Avoid Filament bug: getHasActionsLivewire() can be null after modal create.
+                    ->successRedirectUrl(fn (): string => '')
                     ->mutateFormDataUsing(function (array $data): array {
                         $data = $this->applyAudioMetadata($data);
                         $data['created_by'] = Auth::id();
                         $data['status'] = RecitationStatus::Draft;
 
                         return $data;
+                    })
+                    ->after(function (): void {
+                        Notification::make()
+                            ->title('Surah added')
+                            ->success()
+                            ->send();
                     }),
             ])
             ->recordActionsColumnLabel('Actions')
@@ -207,7 +228,10 @@ class RecitationsRelationManager extends RelationManager
                     ->openUrlInNewTab()
                     ->visible(fn (Recitation $record): bool => filled($record->audio_url)),
                 EditAction::make()
-                    ->mutateFormDataUsing(fn (array $data): array => $this->applyAudioMetadata($data)),
+                    ->successRedirectUrl(fn (): string => '')
+                    ->mutateFormDataUsing(function (array $data, Recitation $record): array {
+                        return $this->applyAudioMetadata($data, $record);
+                    }),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -254,17 +278,29 @@ class RecitationsRelationManager extends RelationManager
      * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
-    protected function applyAudioMetadata(array $data): array
+    protected function applyAudioMetadata(array $data, ?Recitation $existing = null): array
     {
+        $audio = $data['audio_url'] ?? null;
+
+        if (is_array($audio)) {
+            $audio = $audio[0] ?? null;
+        }
+
+        $isNewUpload = $audio instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+        $audioUnchanged = $existing && is_string($audio) && $audio === $existing->audio_url;
+
+        if ($audioUnchanged || (! $isNewUpload && $existing && is_string($audio))) {
+            // Existing R2 path on edit — never wipe stored duration/size.
+            $data['duration'] = $existing->duration;
+            $data['file_size'] = $existing->file_size;
+
+            return $data;
+        }
+
         $meta = AudioMetadata::fromUpload($data['audio_url'] ?? null, 'r2');
 
-        if ($meta['duration'] !== null) {
-            $data['duration'] = $meta['duration'];
-        }
-
-        if ($meta['file_size'] !== null) {
-            $data['file_size'] = $meta['file_size'];
-        }
+        $data['duration'] = $meta['duration'] ?? $existing?->duration ?? ($data['duration'] ?? null);
+        $data['file_size'] = $meta['file_size'] ?? $existing?->file_size ?? ($data['file_size'] ?? null);
 
         return $data;
     }

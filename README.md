@@ -38,11 +38,18 @@ Seeded staff (password: `password`):
 |------|------|
 | `/` | Homepage (hero, featured reciters, stats, partners) |
 | `/reciters` | Reciter list (search + region filter) |
-| `/reciters/{id}` | Reciter detail + approved recordings |
+| `/reciters/{id}` | Reciter detail + approved recordings (`?play=` deep link) |
+| `/listen/{recitation}` | Follow-along Arabic text synced to audio |
 | `/story` | The Story So Far (patrons, leadership, team) |
+| `/login`, `/register` | Optional listener accounts (session) |
+| `/library/favorites` | Saved favorites (auth) |
+| `/library/playlists` | Playlists CRUD (auth) |
 | `/locale/{en\|so\|ar}` | Language switch (session + RTL for Arabic) |
 
-Approved recitations only. Sticky bottom player uses temporary R2 audio URLs.
+Approved recitations only. Sticky bottom player uses temporary R2 audio URLs. Share uses the Web Share API (clipboard fallback). Follow-along uses **per-recitation ayah timestamps** generated once with FFmpeg + Python (`php artisan ayah:sync --check`, admin **Sync text now**). Equal-time fallback only until a recitation is synced.
+
+**Ayah text:** Uthmani dataset in `database/data/ayahs-uthmani.json` (seeded by `AyahSeeder`).
+**Ayah sync tools:** see `tools/README.md` (portable FFmpeg in `tools/bin/`).
 
 **Super Admin only (Filament → Story Page):** hero/closing copy, patrons & leadership, Behind the Voices team, partners list, and the homepage partners on/off toggle.
 

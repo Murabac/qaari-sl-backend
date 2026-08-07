@@ -4,10 +4,12 @@ namespace App\Filament\Resources\Partners;
 
 use App\Filament\Resources\Partners\Pages\ManagePartners;
 use App\Models\Partner;
+use App\Support\MediaUrl;
 use BackedEnum;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -66,6 +68,21 @@ class PartnerResource extends Resource
                     ->image()
                     ->imageEditor()
                     ->maxSize(5120)
+                    ->fetchFileInformation(false)
+                    ->getUploadedFileUsing(function (BaseFileUpload $component, string $file, string|array|null $storedFileNames): ?array {
+                        $url = MediaUrl::temporary('r2', $file);
+
+                        if (blank($url)) {
+                            return null;
+                        }
+
+                        return [
+                            'name' => is_array($storedFileNames) ? ($storedFileNames[$file] ?? basename($file)) : ($storedFileNames ?: basename($file)),
+                            'size' => 0,
+                            'type' => null,
+                            'url' => $url,
+                        ];
+                    })
                     ->columnSpanFull(),
                 Toggle::make('is_active')
                     ->label('Visible on homepage')
@@ -79,7 +96,9 @@ class PartnerResource extends Resource
             ->columns([
                 ImageColumn::make('logo_url')
                     ->label('Logo')
-                    ->disk('r2'),
+                    ->checkFileExistence(false)
+                    ->getStateUsing(fn (Partner $record): ?string => MediaUrl::temporary('r2', $record->logo_url))
+                    ->defaultImageUrl(asset('images/logo.svg')),
                 TextColumn::make('name')->searchable()->sortable(),
                 TextColumn::make('url')->limit(40)->toggleable(),
                 TextColumn::make('sort_order')->label('Order')->sortable(),
