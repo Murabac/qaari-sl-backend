@@ -168,7 +168,12 @@
                 <img src="{{ asset('images/logo.svg') }}" alt="" class="h-8 w-8">
                 <span class="font-display text-lg font-semibold">{{ __('site.footer_brand') }}</span>
             </div>
-            <p class="max-w-xl text-sm text-qaari-primary-fg/70">{{ __('site.platform_desc') }}</p>
+            <div class="max-w-xl space-y-2">
+                <p class="text-sm text-qaari-primary-fg/70">{{ __('site.platform_desc') }}</p>
+                <a href="{{ route('privacy') }}" class="inline-block text-sm font-semibold text-qaari-accent hover:text-qaari-accent-hover">
+                    {{ __('site.privacy_policy') }}
+                </a>
+            </div>
         </div>
     </footer>
 

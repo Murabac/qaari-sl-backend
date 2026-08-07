@@ -37,6 +37,8 @@ return [
     'pause' => 'إيقاف',
     'close_player' => 'إغلاق المشغل',
     'footer_brand' => 'Xulka Quraa\'da',
+    'privacy_policy' => 'سياسة الخصوصية',
+    'privacy_last_updated' => 'آخر تحديث',
     'story_title' => 'القصة حتى الآن',
     'patrons_eyebrow' => 'التوجيه',
     'patrons_title' => 'الرعاة والقيادة',

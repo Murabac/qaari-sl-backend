@@ -14,6 +14,7 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('/reciters', [ReciterController::class, 'index'])->name('reciters.index');
 Route::get('/reciters/{reciter}', [ReciterController::class, 'show'])->name('reciters.show');
 Route::get('/story', StoryController::class)->name('story');
+Route::view('/privacy', 'privacy')->name('privacy');
 Route::get('/locale/{locale}', LocaleController::class)->name('locale.switch');
 Route::get('/listen/{recitation}', [FollowAlongController::class, 'show'])->name('follow-along.show');
 

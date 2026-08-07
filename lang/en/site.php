@@ -37,6 +37,8 @@ return [
     'pause' => 'Pause',
     'close_player' => 'Close player',
     'footer_brand' => 'Xulka Quraa\'da',
+    'privacy_policy' => 'Privacy Policy',
+    'privacy_last_updated' => 'Last updated',
     'story_title' => 'The Story So Far',
     'patrons_eyebrow' => 'Guidance',
     'patrons_title' => 'Patrons & Leadership',

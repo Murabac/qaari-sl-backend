@@ -37,6 +37,8 @@ return [
     'pause' => 'Hakad',
     'close_player' => 'Xir ciyaartoyga',
     'footer_brand' => 'Xulka Quraa\'da',
+    'privacy_policy' => 'Siyaasadda Asturnaanta',
+    'privacy_last_updated' => 'La cusbooneysiiyay',
     'story_title' => 'Sheekada Ilaa Hadda',
     'patrons_eyebrow' => 'Hagidda',
     'patrons_title' => 'Masuuliyiinta & Hoggaanka',
