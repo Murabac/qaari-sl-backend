@@ -1,5 +1,12 @@
 <?php
 
+use App\Http\Controllers\Api\Staff\AuthController as StaffAuthController;
+use App\Http\Controllers\Api\Staff\AyahSyncController as StaffAyahSyncController;
+use App\Http\Controllers\Api\Staff\DashboardController as StaffDashboardController;
+use App\Http\Controllers\Api\Staff\RecitationController as StaffRecitationController;
+use App\Http\Controllers\Api\Staff\ReciterController as StaffReciterController;
+use App\Http\Controllers\Api\Staff\ReviewController as StaffReviewController;
+use App\Http\Controllers\Api\Staff\SurahController as StaffSurahController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\FavoriteController;
 use App\Http\Controllers\Api\V1\PlaylistController;
@@ -9,6 +16,40 @@ use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\StoryController;
 use App\Http\Controllers\Api\V1\SurahController;
 use Illuminate\Support\Facades\Route;
+
+Route::prefix('staff')->group(function (): void {
+    Route::post('login', [StaffAuthController::class, 'login']);
+
+    Route::middleware(['auth:sanctum', 'staff'])->group(function (): void {
+        Route::post('logout', [StaffAuthController::class, 'logout']);
+        Route::get('me', [StaffAuthController::class, 'me']);
+        Route::get('dashboard', StaffDashboardController::class);
+        Route::get('surahs', [StaffSurahController::class, 'index']);
+
+        Route::get('reciters', [StaffReciterController::class, 'index']);
+        Route::post('reciters', [StaffReciterController::class, 'store']);
+        Route::get('reciters/{reciter}', [StaffReciterController::class, 'show']);
+        Route::put('reciters/{reciter}', [StaffReciterController::class, 'update']);
+        Route::post('reciters/{reciter}', [StaffReciterController::class, 'update']);
+
+        Route::get('reciters/{reciter}/recitations', [StaffRecitationController::class, 'indexForReciter']);
+        Route::post('reciters/{reciter}/recitations', [StaffRecitationController::class, 'store']);
+
+        Route::get('recitations/{recitation}', [StaffRecitationController::class, 'show']);
+        Route::put('recitations/{recitation}', [StaffRecitationController::class, 'update']);
+        Route::post('recitations/{recitation}/submit', [StaffRecitationController::class, 'submit']);
+        Route::post('recitations/{recitation}/replace-audio', [StaffRecitationController::class, 'replaceAudio']);
+        Route::get('recitations/{recitation}/review-notes', [StaffRecitationController::class, 'reviewNotes']);
+
+        Route::get('recitations/{recitation}/ayah-sync', [StaffAyahSyncController::class, 'show']);
+        Route::put('recitations/{recitation}/ayah-sync', [StaffAyahSyncController::class, 'save']);
+        Route::post('recitations/{recitation}/ayah-sync/auto', [StaffAyahSyncController::class, 'autoSync']);
+
+        Route::get('reviews', [StaffReviewController::class, 'index']);
+        Route::post('recitations/{recitation}/approve', [StaffReviewController::class, 'approve']);
+        Route::post('recitations/{recitation}/reject', [StaffReviewController::class, 'reject']);
+    });
+});
 
 Route::prefix('v1')->group(function (): void {
     Route::get('reciters', [ReciterController::class, 'index']);

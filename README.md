@@ -90,6 +90,30 @@ Public catalog returns **approved** recitations only. Media URLs are temporary R
 | DELETE | `/api/v1/playlists/{playlist}/items/{item}` |
 | PUT | `/api/v1/playlists/{playlist}/reorder` (`item_ids` array) |
 
+## Staff API (`/api/staff`)
+
+Internal Sanctum API for the `qaari-sl-staff` Flutter app (Production + Admin). Not for consumers. Roles: `super_admin`, `admin`, `production`.
+
+| Method | Path | Notes |
+|--------|------|-------|
+| POST | `/api/staff/login` | Staff roles only → Bearer token + roles |
+| POST | `/api/staff/logout` | Auth required |
+| GET | `/api/staff/me` | Includes Spatie `roles` |
+| GET | `/api/staff/dashboard` | Role-scoped counts |
+| GET | `/api/staff/surahs` | Full surah list for upload picker |
+| GET/POST | `/api/staff/reciters` | Scoped by ownership for Production |
+| GET/PUT/POST | `/api/staff/reciters/{id}` | POST accepts multipart photo update |
+| GET/POST | `/api/staff/reciters/{id}/recitations` | Create with multipart `audio` |
+| POST | `/api/staff/recitations/{id}/submit` | draft/rejected → pending_review |
+| POST | `/api/staff/recitations/{id}/replace-audio` | Re-upload; optional `submit` |
+| GET | `/api/staff/reviews` | Admin queue (`status=pending_review`) |
+| POST | `/api/staff/recitations/{id}/approve` | Reviewer only |
+| POST | `/api/staff/recitations/{id}/reject` | Multipart `voice_note` required |
+| GET | `/api/staff/recitations/{id}/review-notes` | Voice note history |
+| GET | `/api/staff/recitations/{id}/ayah-sync` | Admin: ayahs + starts (seconds) + resume |
+| PUT | `/api/staff/recitations/{id}/ayah-sync` | Admin: save manual timings (`ayah_starts`, `resume_ayah`) |
+| POST | `/api/staff/recitations/{id}/ayah-sync/auto` | Admin: run auto aligner (`overwrite_manual` optional) |
+
 ## Tests
 
 ```bash

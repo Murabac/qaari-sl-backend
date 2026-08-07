@@ -60,6 +60,14 @@ class RecitationPolicy
         return $user->isReviewer() && $recitation->status === RecitationStatus::PendingReview;
     }
 
+    /**
+     * Manual / auto ayah timing sync — Admin & Super Admin only.
+     */
+    public function syncAyahs(User $user, Recitation $recitation): bool
+    {
+        return $user->isReviewer() && filled($recitation->audio_url);
+    }
+
     public function reopen(User $user, Recitation $recitation): bool
     {
         return $user->isReviewer() && $recitation->status === RecitationStatus::Approved;
