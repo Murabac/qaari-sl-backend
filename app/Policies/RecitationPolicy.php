@@ -45,6 +45,11 @@ class RecitationPolicy
         return $recitation->isOwnedBy($user) && $recitation->canBeEditedByProduction();
     }
 
+    public function deleteAny(User $user): bool
+    {
+        return $user->isReviewer() || $user->isProduction();
+    }
+
     public function submit(User $user, Recitation $recitation): bool
     {
         if ($user->isReviewer()) {

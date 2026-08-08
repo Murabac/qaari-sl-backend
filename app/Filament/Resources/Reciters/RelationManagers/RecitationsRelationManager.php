@@ -232,11 +232,16 @@ class RecitationsRelationManager extends RelationManager
                     ->mutateFormDataUsing(function (array $data, Recitation $record): array {
                         return $this->applyAudioMetadata($data, $record);
                     }),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->successRedirectUrl(fn (): string => \App\Filament\Resources\Reciters\ReciterResource::getUrl(
+                        'edit',
+                        ['record' => $this->getOwnerRecord()],
+                    )),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->authorizeIndividualRecords('delete'),
                 ]),
             ]);
     }

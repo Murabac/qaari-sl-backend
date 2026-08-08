@@ -17,6 +17,7 @@ Route::get('/reciters/{reciter}', [ReciterController::class, 'show'])->name('rec
 Route::get('/story', StoryController::class)->name('story');
 Route::view('/privacy', 'privacy')->name('privacy');
 Route::get('/account-deletion', [AccountDeletionController::class, 'show'])->name('account-deletion');
+Route::get('/account-deletion/done', [AccountDeletionController::class, 'done'])->name('account-deletion.done');
 Route::delete('/account-deletion', [AccountDeletionController::class, 'destroy'])->name('account-deletion.destroy');
 Route::get('/locale/{locale}', LocaleController::class)->name('locale.switch');
 Route::get('/listen/{recitation}', [FollowAlongController::class, 'show'])->name('follow-along.show');

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\AccountDeletionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 use RuntimeException;
@@ -18,7 +19,12 @@ class AccountDeletionController extends Controller
         return view('account-deletion');
     }
 
-    public function destroy(Request $request): RedirectResponse|View
+    public function done(): View
+    {
+        return view('account-deletion-done');
+    }
+
+    public function destroy(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'email' => ['required', 'email', 'max:255'],
@@ -42,6 +48,12 @@ class AccountDeletionController extends Controller
                 ->withErrors(['email' => $e->getMessage()]);
         }
 
-        return view('account-deletion-done');
+        // Clear the browser session so the success page does not hydrate a
+        // user record that was just deleted (common cause of a 500 after delete).
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('account-deletion.done');
     }
 }

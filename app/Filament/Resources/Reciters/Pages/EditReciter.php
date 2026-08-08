@@ -13,7 +13,8 @@ class EditReciter extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->successRedirectUrl(ReciterResource::getUrl('index')),
         ];
     }
 }

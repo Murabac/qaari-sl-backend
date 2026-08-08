@@ -176,7 +176,8 @@ class EditRecitation extends EditRecord
 
                     $this->redirect(static::getUrl(['record' => $record]), navigate: true);
                 }),
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->successRedirectUrl(RecitationResource::getUrl('index')),
         ];
     }
 

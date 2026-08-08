@@ -30,4 +30,9 @@ class UserPolicy
     {
         return $user->isSuperAdmin() && $user->id !== $model->id;
     }
+
+    public function deleteAny(User $user): bool
+    {
+        return $user->isSuperAdmin();
+    }
 }

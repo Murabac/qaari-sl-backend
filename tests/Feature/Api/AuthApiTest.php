@@ -71,4 +71,54 @@ class AuthApiTest extends TestCase
             ->getJson('/api/v1/auth/me')
             ->assertUnauthorized();
     }
+
+    public function test_listener_can_delete_account_with_password(): void
+    {
+        $user = $this->makeUser(['email' => 'delete-me@example.com']);
+        $token = $user->createToken('api')->plainTextToken;
+
+        $this->withToken($token)
+            ->deleteJson('/api/v1/auth/account', [
+                'password' => 'password',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.message', 'Account deleted');
+
+        $this->assertDatabaseMissing('users', ['email' => 'delete-me@example.com']);
+    }
+
+    public function test_delete_account_rejects_wrong_password(): void
+    {
+        $user = $this->makeUser(['email' => 'keep-me@example.com']);
+        $token = $user->createToken('api')->plainTextToken;
+
+        $this->withToken($token)
+            ->deleteJson('/api/v1/auth/account', [
+                'password' => 'wrong-password',
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseHas('users', ['email' => 'keep-me@example.com']);
+    }
+
+    public function test_staff_cannot_self_delete_via_listener_api(): void
+    {
+        \Spatie\Permission\Models\Role::findOrCreate('production', 'web');
+
+        $user = $this->makeUser([
+            'email' => 'staff-listener-delete@example.com',
+        ]);
+        $user->assignRole('production');
+        $token = $user->createToken('api')->plainTextToken;
+
+        $this->withToken($token)
+            ->deleteJson('/api/v1/auth/account', [
+                'password' => 'password',
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'staff-listener-delete@example.com',
+        ]);
+    }
 }

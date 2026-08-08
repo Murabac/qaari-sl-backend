@@ -31,4 +31,9 @@ class ReciterPolicy
     {
         return $user->isReviewer() || $reciter->isOwnedBy($user);
     }
+
+    public function deleteAny(User $user): bool
+    {
+        return $user->isReviewer() || $user->isProduction();
+    }
 }
