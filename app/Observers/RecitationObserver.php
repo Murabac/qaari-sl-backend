@@ -41,6 +41,11 @@ class RecitationObserver
             return;
         }
 
+        // Never auto-queue over hand-marked timings unless audio/surah actually changed.
+        if ($recitation->sync_method === 'manual' && ! $audioChanged) {
+            return;
+        }
+
         if (! $audioChanged && $recitation->sync_status === SyncStatus::Synced) {
             return;
         }

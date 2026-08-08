@@ -160,8 +160,13 @@ class AyahTimingSyncService
             (int) ($recitation->ayahTimings()->max('end_ms') ?? 0),
         );
 
+        if ($durationMs < 1000 && $startsSeconds !== []) {
+            // Coolify creates sometimes skip ffprobe; derive a usable length from marks.
+            $durationMs = (int) round(max(array_map('floatval', $startsSeconds)) * 1000) + 1000;
+        }
+
         if ($durationMs < 1000) {
-            throw new RuntimeException('Recitation duration is missing — save audio metadata first.');
+            throw new RuntimeException('Recitation duration is missing — open the recitation, re-save the audio, then try again.');
         }
 
         $normalized = [];
@@ -215,16 +220,18 @@ class AyahTimingSyncService
 
             RecitationAyahTiming::query()->insert($rows);
 
-            $recitation->update([
-                'sync_status' => SyncStatus::Synced,
-                'synced_at' => now(),
-                'sync_error' => null,
-                'sync_method' => 'manual',
-                'manual_sync_ayah' => $resume,
-            ]);
+            Recitation::withoutEvents(function () use ($recitation, $resume): void {
+                $recitation->update([
+                    'sync_status' => SyncStatus::Synced,
+                    'synced_at' => now(),
+                    'sync_error' => null,
+                    'sync_method' => 'manual',
+                    'manual_sync_ayah' => $resume,
+                ]);
+            });
         });
 
-        return $recitation->fresh(['ayahTimings', 'surah']);
+        return $recitation->fresh();
     }
 
     /**

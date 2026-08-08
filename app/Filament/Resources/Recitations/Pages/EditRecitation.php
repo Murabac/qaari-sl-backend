@@ -15,11 +15,17 @@ use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Throwable;
 
 class EditRecitation extends EditRecord
 {
     protected static string $resource = RecitationResource::class;
+
+    public function dehydrate(): void
+    {
+        $this->stripHeavyRecordRelations();
+    }
 
     protected function getHeaderActions(): array
     {
@@ -42,35 +48,21 @@ class EditRecitation extends EditRecord
                 ->modalHeading('Match text automatically?')
                 ->modalDescription('We’ll listen to the recording and try to mark when each ayah begins. You can fine-tune anything afterwards.')
                 ->modalSubmitActionLabel('Match automatically')
-                ->action(function (AyahTimingSyncService $sync) use ($record): void {
-                    try {
-                        $toolchain = $sync->toolchainReady();
+                ->action(function () use ($record): void {
+                    $record->update([
+                        'sync_status' => SyncStatus::Pending,
+                        'sync_error' => null,
+                    ]);
 
-                        if (! $toolchain['ready']) {
-                            Notification::make()
-                                ->title('Matching tools not ready')
-                                ->body('Ask your developer to finish setup (FFmpeg), then try again.')
-                                ->danger()
-                                ->send();
+                    SyncRecitationAyahTimingsJob::dispatch($record->id);
 
-                            return;
-                        }
+                    Notification::make()
+                        ->title('Matching started in the background')
+                        ->body('Automatic matching can take a few minutes on the server. Refresh this page later to see the result.')
+                        ->success()
+                        ->send();
 
-                        $sync->sync($record->fresh(['surah']));
-
-                        Notification::make()
-                            ->title('Text matched')
-                            ->body('Listeners can now follow along. Adjust anything that feels off below.')
-                            ->success()
-                            ->send();
-                    } catch (Throwable $e) {
-                        Notification::make()
-                            ->title('Could not match text')
-                            ->body($e->getMessage())
-                            ->danger()
-                            ->send();
-                    }
-
+                    $this->stripHeavyRecordRelations();
                     $this->redirect(static::getUrl(['record' => $record]), navigate: true);
                 }),
             Action::make('replaceManualWithAutoSync')
@@ -80,37 +72,28 @@ class EditRecitation extends EditRecord
                 ->visible(fn (): bool => filled($record->audio_url) && $record->sync_method === 'manual')
                 ->requiresConfirmation()
                 ->modalHeading('Start over?')
-                ->modalDescription('This clears the ayah marks you set by hand and tries automatic matching instead. Only do this if you’re sure.')
+                ->modalDescription('This clears the ayah marks you set by hand and queues automatic matching instead. Only do this if you’re sure.')
                 ->modalSubmitActionLabel('Yes, start over')
-                ->action(function (AyahTimingSyncService $sync) use ($record): void {
-                    try {
-                        $toolchain = $sync->toolchainReady();
+                ->action(function () use ($record): void {
+                    $record->forceFill([
+                        'sync_status' => SyncStatus::Pending,
+                        'synced_at' => null,
+                        'sync_error' => null,
+                        'sync_method' => null,
+                        'manual_sync_ayah' => null,
+                    ])->save();
 
-                        if (! $toolchain['ready']) {
-                            Notification::make()
-                                ->title('Matching tools not ready')
-                                ->body('Ask your developer to finish setup (FFmpeg), then try again.')
-                                ->danger()
-                                ->send();
+                    $record->ayahTimings()->delete();
 
-                            return;
-                        }
+                    SyncRecitationAyahTimingsJob::dispatch($record->id);
 
-                        $sync->sync($record->fresh(['surah']), overwriteManual: true);
+                    Notification::make()
+                        ->title('Automatic matching queued')
+                        ->body('Your hand-marked ayahs were cleared. Refresh in a few minutes for the new result.')
+                        ->success()
+                        ->send();
 
-                        Notification::make()
-                            ->title('Started over')
-                            ->body('Automatic matching replaced your hand-marked ayahs.')
-                            ->success()
-                            ->send();
-                    } catch (Throwable $e) {
-                        Notification::make()
-                            ->title('Could not match text')
-                            ->body($e->getMessage())
-                            ->danger()
-                            ->send();
-                    }
-
+                    $this->stripHeavyRecordRelations();
                     $this->redirect(static::getUrl(['record' => $record]), navigate: true);
                 }),
             Action::make('queueSync')
@@ -134,6 +117,7 @@ class EditRecitation extends EditRecord
                         ->success()
                         ->send();
 
+                    $this->stripHeavyRecordRelations();
                     $this->redirect(static::getUrl(['record' => $record]), navigate: true);
                 }),
             Action::make('submitForReview')
@@ -153,6 +137,7 @@ class EditRecitation extends EditRecord
                         ->success()
                         ->send();
 
+                    $this->stripHeavyRecordRelations();
                     $this->redirect(static::getUrl(['record' => $record]), navigate: true);
                 }),
             Action::make('reopen')
@@ -174,6 +159,7 @@ class EditRecitation extends EditRecord
                         ->success()
                         ->send();
 
+                    $this->stripHeavyRecordRelations();
                     $this->redirect(static::getUrl(['record' => $record]), navigate: true);
                 }),
             DeleteAction::make()
@@ -191,7 +177,7 @@ class EditRecitation extends EditRecord
 
         try {
             app(AyahTimingSyncService::class)->saveManualTimings(
-                $record->fresh(['surah', 'ayahTimings']),
+                $record->fresh(),
                 $startsSeconds,
                 $resumeAyah,
             );
@@ -206,6 +192,8 @@ class EditRecitation extends EditRecord
                 ->success()
                 ->send();
         } catch (Throwable $e) {
+            report($e);
+
             Notification::make()
                 ->title('Could not save timings')
                 ->body($e->getMessage())
@@ -215,8 +203,9 @@ class EditRecitation extends EditRecord
             return;
         }
 
-        // Stay on the page so admins can keep working; refresh record for resume marker.
-        $this->record = $record->fresh(['ayahTimings', 'surah.ayahs']);
+        // Refresh scalars only — never hydrate ayahs onto the Livewire record.
+        $this->record = $record->fresh();
+        $this->stripHeavyRecordRelations();
     }
 
     /**
@@ -233,7 +222,11 @@ class EditRecitation extends EditRecord
             $audio = $audio[0] ?? null;
         }
 
-        if (is_string($audio) && $audio === $record->audio_url) {
+        $isNewUpload = $audio instanceof TemporaryUploadedFile
+            || (is_string($audio) && $audio !== $record->audio_url);
+
+        if (! $isNewUpload) {
+            $data['audio_url'] = $record->audio_url;
             $data['duration'] = $record->duration;
             $data['file_size'] = $record->file_size;
 
@@ -246,5 +239,22 @@ class EditRecitation extends EditRecord
         $data['file_size'] = $meta['file_size'] ?? $record->file_size;
 
         return $data;
+    }
+
+    protected function afterSave(): void
+    {
+        $this->stripHeavyRecordRelations();
+    }
+
+    private function stripHeavyRecordRelations(): void
+    {
+        if (! $this->record instanceof Recitation) {
+            return;
+        }
+
+        $this->record->unsetRelation('ayahTimings');
+        $this->record->unsetRelation('surah');
+        $this->record->unsetRelation('reviewNotes');
+        $this->record->unsetRelation('reciter');
     }
 }

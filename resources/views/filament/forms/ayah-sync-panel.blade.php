@@ -1,26 +1,19 @@
 @php
     use App\Enums\SyncStatus;
-    use App\Support\MediaUrl;
     /** @var \App\Models\Recitation|null $record */
+    /** @var list<array{n:int,t:string}> $ayahRows */
+    /** @var list<array{ayah_number:int,start_ms:int,end_ms:int}> $timingRows */
+    $ayahRows = $ayahRows ?? [];
+    $timingRows = $timingRows ?? [];
+    $audioUrl = $audioUrl ?? null;
     $status = $record?->sync_status ?? SyncStatus::Pending;
-    $timings = $record?->relationLoaded('ayahTimings')
-        ? $record->ayahTimings
-        : ($record?->ayahTimings()->orderBy('ayah_number')->get() ?? collect());
-    $ayahs = $record?->surah
-        ? ($record->surah->relationLoaded('ayahs')
-            ? $record->surah->ayahs->sortBy('number')->values()
-            : $record->surah->ayahs()->orderBy('number')->get())
-        : collect();
-    $audioUrl = $record && filled($record->audio_url)
-        ? MediaUrl::temporary('r2', $record->audio_url)
-        : null;
-    $durationSeconds = max(1, (int) ($record->duration ?? 0));
-    $verseCount = max(1, $ayahs->count() ?: (int) ($record?->surah?->verse_count ?? 1));
+    $durationSeconds = max(1, (int) ($record?->duration ?? 0));
+    $verseCount = max(1, (int) ($verseCount ?? 0) ?: count($ayahRows) ?: 1);
 
-    if ($timings->isNotEmpty()) {
-        $starts = $timings
+    if ($timingRows !== []) {
+        $starts = collect($timingRows)
             ->sortBy('ayah_number')
-            ->map(fn ($t) => round($t->start_ms / 1000, 3))
+            ->map(fn (array $t) => round($t['start_ms'] / 1000, 3))
             ->values()
             ->all();
     } else {
@@ -31,10 +24,9 @@
         }
     }
 
-    $ayahPayload = $ayahs->map(fn ($a) => [
-        'n' => (int) $a->number,
-        't' => (string) $a->text_uthmani,
-    ])->values()->all();
+    $ayahPayload = $ayahRows !== []
+        ? $ayahRows
+        : collect(range(1, $verseCount))->map(fn (int $n) => ['n' => $n, 't' => ''])->all();
 
     $isSynced = $status === SyncStatus::Synced;
     $isFailed = $status === SyncStatus::Failed;
