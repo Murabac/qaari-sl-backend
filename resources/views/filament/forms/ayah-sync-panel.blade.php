@@ -474,6 +474,7 @@
                                     this.dirty = false;
                                 } catch (err) {
                                     console.error(err);
+                                    alert('Could not save progress. Check your connection and try again.');
                                 } finally {
                                     this.saving = false;
                                 }

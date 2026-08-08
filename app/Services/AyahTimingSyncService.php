@@ -220,13 +220,15 @@ class AyahTimingSyncService
 
             RecitationAyahTiming::query()->insert($rows);
 
-            Recitation::withoutEvents(function () use ($recitation, $resume): void {
+            Recitation::withoutEvents(function () use ($recitation, $resume, $durationMs): void {
                 $recitation->update([
                     'sync_status' => SyncStatus::Synced,
                     'synced_at' => now(),
                     'sync_error' => null,
                     'sync_method' => 'manual',
                     'manual_sync_ayah' => $resume,
+                    // Persist derived length when create skipped ffprobe on Coolify.
+                    'duration' => max((int) ($recitation->duration ?? 0), (int) round($durationMs / 1000)),
                 ]);
             });
         });

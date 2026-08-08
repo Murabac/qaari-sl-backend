@@ -15,6 +15,8 @@ use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Renderless;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Throwable;
 
@@ -163,30 +165,48 @@ class EditRecitation extends EditRecord
     }
 
     /**
-     * @param  list<float|int|string>  $startsSeconds
+     * Save hand-marked ayah starts without re-rendering the Filament page.
+     * Re-rendering embeds the full surah text again and was returning 500 on Coolify.
+     *
+     * @param  list<float|int|string>|array<mixed>  $startsSeconds
      */
-    public function saveManualTimings(array $startsSeconds, ?int $resumeAyah = null): void
+    #[Renderless]
+    public function saveManualTimings(mixed $startsSeconds = [], mixed $resumeAyah = null): void
     {
-        /** @var Recitation $record */
-        $record = $this->getRecord();
-
         try {
+            $starts = collect(is_array($startsSeconds) ? $startsSeconds : [])
+                ->map(fn ($value): float => round((float) $value, 3))
+                ->values()
+                ->all();
+
+            $resume = ($resumeAyah === null || $resumeAyah === '')
+                ? null
+                : (int) $resumeAyah;
+
+            /** @var Recitation $record */
+            $record = $this->getRecord();
+
             app(AyahTimingSyncService::class)->saveManualTimings(
                 $record->fresh(),
-                $startsSeconds,
-                $resumeAyah,
+                $starts,
+                $resume,
             );
 
             Notification::make()
                 ->title('Progress saved')
                 ->body(
-                    $resumeAyah
-                        ? "All set. Next time we’ll open ayah {$resumeAyah} for you."
+                    $resume
+                        ? "All set. Next time we’ll open ayah {$resume} for you."
                         : 'All set. You can leave and continue later anytime.'
                 )
                 ->success()
                 ->send();
         } catch (Throwable $e) {
+            Log::error('saveManualTimings failed', [
+                'recitation_id' => $this->record?->getKey(),
+                'starts_count' => is_array($startsSeconds) ? count($startsSeconds) : null,
+                'error' => $e->getMessage(),
+            ]);
             report($e);
 
             Notification::make()
@@ -194,13 +214,7 @@ class EditRecitation extends EditRecord
                 ->body($e->getMessage())
                 ->danger()
                 ->send();
-
-            return;
         }
-
-        // Refresh scalars only — never hydrate ayahs onto the Livewire record.
-        $this->record = $record->fresh();
-        $this->stripHeavyRecordRelations();
     }
 
     /**
