@@ -64,6 +64,7 @@ class PartnerResource extends Resource
                 FileUpload::make('logo_url')
                     ->label('Logo')
                     ->disk('r2')
+                    ->visibility('private')
                     ->directory('partners/logos')
                     ->image()
                     ->imageEditor()

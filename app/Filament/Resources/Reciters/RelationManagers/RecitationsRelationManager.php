@@ -67,6 +67,7 @@ class RecitationsRelationManager extends RelationManager
                 FileUpload::make('audio_url')
                     ->label('Audio file')
                     ->disk('r2')
+                    ->visibility('private')
                     ->directory('recitations/audio')
                     ->acceptedFileTypes([
                         'audio/mpeg',

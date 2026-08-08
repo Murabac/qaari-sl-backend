@@ -67,6 +67,7 @@ class StoryTeamMemberResource extends Resource
                 FileUpload::make('photo_url')
                     ->label('Photo')
                     ->disk('r2')
+                    ->visibility('private')
                     ->directory('story/team')
                     ->image()
                     ->imageEditor()

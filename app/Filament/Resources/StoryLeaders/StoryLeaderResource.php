@@ -70,6 +70,7 @@ class StoryLeaderResource extends Resource
                 FileUpload::make('photo_url')
                     ->label('Photo')
                     ->disk('r2')
+                    ->visibility('private')
                     ->directory('story/leaders')
                     ->image()
                     ->imageEditor()

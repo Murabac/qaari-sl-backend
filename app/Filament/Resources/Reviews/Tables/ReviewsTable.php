@@ -103,6 +103,7 @@ class ReviewsTable
                                 FileUpload::make('voice_note')
                                     ->label('Or upload an audio file')
                                     ->disk('r2')
+                                    ->visibility('private')
                                     ->directory('reviews/voice-notes')
                                     ->acceptedFileTypes([
                                         'audio/mpeg',

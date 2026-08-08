@@ -56,6 +56,7 @@ class ReciterForm
                             ->label('Photo')
                             ->disk('r2')
                             ->directory('reciters/photos')
+                            ->visibility('private')
                             ->image()
                             ->imageEditor()
                             ->maxSize(5120)
