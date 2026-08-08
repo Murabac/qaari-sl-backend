@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Reciters\Schemas;
 
+use App\Support\FilamentR2FileUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -52,15 +53,15 @@ class ReciterForm
                 Section::make('Profile')
                     ->columns(2)
                     ->schema([
-                        FileUpload::make('photo_url')
-                            ->label('Photo')
-                            ->disk('r2')
-                            ->directory('reciters/photos')
-                            ->visibility('private')
-                            ->image()
-                            ->imageEditor()
-                            ->maxSize(5120)
-                            ->columnSpanFull(),
+                        FilamentR2FileUpload::configure(
+                            FileUpload::make('photo_url')
+                                ->label('Photo')
+                                ->directory('reciters/photos')
+                                ->image()
+                                ->imageEditor()
+                                ->maxSize(5120)
+                                ->columnSpanFull(),
+                        ),
                         TextInput::make('region')
                             ->label('Region')
                             ->placeholder('e.g. Hargeisa')

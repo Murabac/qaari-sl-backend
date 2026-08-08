@@ -6,6 +6,7 @@ use App\Enums\RecitationStatus;
 use App\Models\Recitation;
 use App\Models\RecitationReviewNote;
 use App\Support\AudioMetadata;
+use App\Support\FilamentR2FileUpload;
 use App\Support\MediaUrl;
 use App\Support\VoiceNote;
 use Filament\Actions\Action;
@@ -100,22 +101,22 @@ class ReviewsTable
                                 ViewField::make('recording')
                                     ->label('Record with your microphone')
                                     ->view('filament.forms.voice-recorder'),
-                                FileUpload::make('voice_note')
-                                    ->label('Or upload an audio file')
-                                    ->disk('r2')
-                                    ->visibility('private')
-                                    ->directory('reviews/voice-notes')
-                                    ->acceptedFileTypes([
-                                        'audio/mpeg',
-                                        'audio/mp3',
-                                        'audio/wav',
-                                        'audio/webm',
-                                        'audio/mp4',
-                                        'audio/m4a',
-                                        'audio/ogg',
-                                        'audio/x-m4a',
-                                    ])
-                                    ->maxSize(20480),
+                                FilamentR2FileUpload::configure(
+                                    FileUpload::make('voice_note')
+                                        ->label('Or upload an audio file')
+                                        ->directory('reviews/voice-notes')
+                                        ->acceptedFileTypes([
+                                            'audio/mpeg',
+                                            'audio/mp3',
+                                            'audio/wav',
+                                            'audio/webm',
+                                            'audio/mp4',
+                                            'audio/m4a',
+                                            'audio/ogg',
+                                            'audio/x-m4a',
+                                        ])
+                                        ->maxSize(20480),
+                                ),
                                 TextInput::make('caption')
                                     ->label('Short caption (optional)')
                                     ->maxLength(255),

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Reciters\Tables;
 
 use App\Filament\Resources\Reciters\ReciterResource;
 use App\Models\Reciter;
+use App\Support\MediaUrl;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -24,7 +25,8 @@ class RecitersTable
             ->columns([
                 ImageColumn::make('photo_url')
                     ->label('Photo')
-                    ->disk('r2')
+                    ->checkFileExistence(false)
+                    ->getStateUsing(fn (Reciter $record): ?string => MediaUrl::temporary('r2', $record->photo_url))
                     ->circular()
                     ->defaultImageUrl(asset('images/logo.svg')),
                 TextColumn::make('name_english')

@@ -6,6 +6,7 @@ use App\Enums\RecitationStatus;
 use App\Models\Recitation;
 use App\Models\Surah;
 use App\Support\AudioMetadata;
+use App\Support\FilamentR2FileUpload;
 use App\Support\MediaUrl;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -64,44 +65,44 @@ class RecitationsRelationManager extends RelationManager
                         'unique' => 'This surah already has a recitation for this reciter.',
                     ])
                     ->columnSpanFull(),
-                FileUpload::make('audio_url')
-                    ->label('Audio file')
-                    ->disk('r2')
-                    ->visibility('private')
-                    ->directory('recitations/audio')
-                    ->acceptedFileTypes([
-                        'audio/mpeg',
-                        'audio/mp3',
-                        'audio/wav',
-                        'audio/x-wav',
-                        'audio/mp4',
-                        'audio/m4a',
-                        'audio/aac',
-                        'audio/ogg',
-                    ])
-                    ->maxSize(204800)
-                    ->required()
-                    ->downloadable()
-                    ->openable()
-                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
-                        // Only analyze freshly uploaded temp files — not existing R2 paths on edit hydrate.
-                        if (! ($state instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
-                            && ! (is_array($state) && ($state[0] ?? null) instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
-                        ) {
-                            return;
-                        }
+                FilamentR2FileUpload::configure(
+                    FileUpload::make('audio_url')
+                        ->label('Audio file')
+                        ->directory('recitations/audio')
+                        ->acceptedFileTypes([
+                            'audio/mpeg',
+                            'audio/mp3',
+                            'audio/wav',
+                            'audio/x-wav',
+                            'audio/mp4',
+                            'audio/m4a',
+                            'audio/aac',
+                            'audio/ogg',
+                        ])
+                        ->maxSize(204800)
+                        ->required()
+                        ->downloadable()
+                        ->openable()
+                        ->afterStateUpdated(function ($state, callable $set, callable $get): void {
+                            // Only analyze freshly uploaded temp files — not existing R2 paths on edit hydrate.
+                            if (! ($state instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
+                                && ! (is_array($state) && ($state[0] ?? null) instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
+                            ) {
+                                return;
+                            }
 
-                        $meta = AudioMetadata::fromUpload($state, 'r2');
+                            $meta = AudioMetadata::fromUpload($state, 'r2');
 
-                        if ($meta['duration'] !== null) {
-                            $set('duration', $meta['duration']);
-                        }
+                            if ($meta['duration'] !== null) {
+                                $set('duration', $meta['duration']);
+                            }
 
-                        if ($meta['file_size'] !== null) {
-                            $set('file_size', $meta['file_size']);
-                        }
-                    })
-                    ->columnSpanFull(),
+                            if ($meta['file_size'] !== null) {
+                                $set('file_size', $meta['file_size']);
+                            }
+                        })
+                        ->columnSpanFull(),
+                ),
                 Hidden::make('duration')->dehydrated(),
                 Hidden::make('file_size')->dehydrated(),
             ]);
