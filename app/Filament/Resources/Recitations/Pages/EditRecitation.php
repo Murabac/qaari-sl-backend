@@ -22,11 +22,6 @@ class EditRecitation extends EditRecord
 {
     protected static string $resource = RecitationResource::class;
 
-    public function dehydrate(): void
-    {
-        $this->stripHeavyRecordRelations();
-    }
-
     protected function getHeaderActions(): array
     {
         /** @var Recitation $record */

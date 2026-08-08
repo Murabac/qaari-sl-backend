@@ -205,7 +205,7 @@
 
             @if (! $audioUrl)
                 <p class="qaari-sync-empty">Add the audio file above first, then you can match the text here.</p>
-            @elseif ($ayahs->isEmpty())
+            @elseif ($ayahRows === [])
                 <p class="qaari-sync-empty">We couldn’t find the ayah text for this surah.</p>
             @else
                 @if ($isManual)
