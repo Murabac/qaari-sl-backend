@@ -5,6 +5,8 @@ namespace App\Observers;
 use App\Enums\SyncStatus;
 use App\Jobs\SyncRecitationAyahTimingsJob;
 use App\Models\Recitation;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class RecitationObserver
 {
@@ -47,6 +49,20 @@ class RecitationObserver
             return;
         }
 
-        SyncRecitationAyahTimingsJob::dispatch($recitation->id)->afterResponse();
+        try {
+            // Always push to the async queue. With QUEUE_CONNECTION=sync the job would
+            // run inline (or on terminate) and can time out Coolify's nginx after create.
+            $connection = config('queue.default') === 'sync'
+                ? 'database'
+                : (string) config('queue.default');
+
+            SyncRecitationAyahTimingsJob::dispatch($recitation->id)
+                ->onConnection($connection);
+        } catch (Throwable $e) {
+            Log::warning('Could not queue ayah sync after recitation save', [
+                'recitation_id' => $recitation->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

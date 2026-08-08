@@ -147,7 +147,7 @@ class AudioMetadata
         }
 
         try {
-            $result = Process::timeout(60)->run([
+            $result = Process::timeout(15)->run([
                 $ffprobe,
                 '-v', 'error',
                 '-show_entries', 'format=duration',
@@ -178,7 +178,6 @@ class AudioMetadata
             base_path('node_modules/ffprobe-static/ffprobe'),
             base_path('tools/bin/ffprobe.exe'),
             base_path('tools/bin/ffprobe'),
-            'ffprobe',
         ];
 
         foreach (glob(base_path('node_modules/ffprobe-static/**/ffprobe.exe')) ?: [] as $match) {
@@ -186,13 +185,24 @@ class AudioMetadata
         }
 
         foreach ($candidates as $candidate) {
-            if ($candidate === 'ffprobe') {
-                return 'ffprobe';
-            }
-
             if (is_file($candidate)) {
                 return $candidate;
             }
+        }
+
+        // Only use PATH ffprobe when it actually exists — otherwise Process::run
+        // can hang/timeout on Coolify and nginx returns 500 after the record saved.
+        try {
+            $result = Process::timeout(3)->run([
+                PHP_OS_FAMILY === 'Windows' ? 'where' : 'which',
+                'ffprobe',
+            ]);
+
+            if ($result->successful() && filled(trim($result->output()))) {
+                return 'ffprobe';
+            }
+        } catch (Throwable) {
+            return null;
         }
 
         return null;

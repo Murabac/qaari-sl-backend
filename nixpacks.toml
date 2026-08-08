@@ -109,6 +109,8 @@ clear_env = no
 php_admin_value[post_max_size] = 256M
 php_admin_value[upload_max_filesize] = 256M
 php_admin_value[memory_limit] = 512M
+php_admin_value[max_execution_time] = 600
+request_terminate_timeout = 600s
 '''
 
 "nginx.template.conf" = '''
@@ -177,6 +179,11 @@ http {
             fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
             include $!{nginx}/conf/fastcgi_params;
             include $!{nginx}/conf/fastcgi.conf;
+            # Filament create (R2 upload + metadata) often exceeds the 60s default.
+            # Without this, nginx returns 500/502 after the DB row was already saved.
+            fastcgi_read_timeout 600s;
+            fastcgi_send_timeout 600s;
+            fastcgi_connect_timeout 60s;
         }
 
         location ~ /\.(?!well-known).* {

@@ -18,13 +18,24 @@ class CreateRecitation extends CreateRecord
      */
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $meta = AudioMetadata::fromUpload($data['audio_url'] ?? null, 'r2');
+        // Prefer duration/size already set by the upload afterStateUpdated hook.
+        // Only probe storage when those are missing — probing R2 on Coolify is slow
+        // and used to blow past nginx's default 60s fastcgi timeout after save.
+        if (blank($data['duration'] ?? null) || blank($data['file_size'] ?? null)) {
+            $meta = AudioMetadata::fromUpload($data['audio_url'] ?? null, 'r2');
+            $data['duration'] = $data['duration'] ?? $meta['duration'];
+            $data['file_size'] = $data['file_size'] ?? $meta['file_size'];
+        }
 
-        $data['duration'] = $meta['duration'] ?? $data['duration'] ?? null;
-        $data['file_size'] = $meta['file_size'] ?? $data['file_size'] ?? null;
         $data['created_by'] = Auth::id();
         $data['status'] = RecitationStatus::Draft;
 
         return $data;
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        // Land on the list (fast) instead of edit (R2 signed URLs + ayah panel).
+        return $this->getResourceUrl('index');
     }
 }
