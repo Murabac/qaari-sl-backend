@@ -9,7 +9,28 @@ use App\Http\Controllers\Web\LocaleController;
 use App\Http\Controllers\Web\PlaylistController;
 use App\Http\Controllers\Web\ReciterController;
 use App\Http\Controllers\Web\StoryController;
+use App\Support\LastExceptionProbe;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/_build', function () {
+    $path = public_path('build-id.txt');
+
+    return response([
+        'build' => is_file($path) ? trim((string) file_get_contents($path)) : null,
+        'app' => config('app.name'),
+        'env' => config('app.env'),
+        'livewire_temp_disk' => config('livewire.temporary_file_upload.disk'),
+        'r2_throw' => (bool) config('filesystems.disks.r2.throw'),
+    ]);
+})->name('build');
+
+Route::get('/_last-error/{token}', function (string $token) {
+    abort_unless(hash_equals(LastExceptionProbe::token(), $token), 404);
+
+    return response()->json(LastExceptionProbe::get() ?? [
+        'message' => 'No exception captured yet. Trigger the 500 once, then reload this URL.',
+    ]);
+})->name('last-error');
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('/reciters', [ReciterController::class, 'index'])->name('reciters.index');

@@ -27,6 +27,12 @@ class AppServiceProvider extends ServiceProvider
         // R2 rejects x-amz-acl on browser uploads; omit ACL from presigned URLs.
         GenerateSignedUploadUrlFacade::swap(new GenerateSignedUploadUrl);
 
+        // Coolify had LIVEWIRE_TEMPORARY_FILE_UPLOAD_DISK=r2 which breaks Filament
+        // remorphs after save. Temp uploads must stay on local disk; final files still go to R2.
+        config([
+            'livewire.temporary_file_upload.disk' => 'local',
+        ]);
+
         if (str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }

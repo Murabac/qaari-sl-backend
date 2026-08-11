@@ -186,6 +186,8 @@ class RecitationsRelationManager extends RelationManager
                             ->title('Surah added')
                             ->success()
                             ->send();
+
+                        $this->skipRender();
                     }),
             ])
             ->recordActionsColumnLabel('Actions')
@@ -220,6 +222,8 @@ class RecitationsRelationManager extends RelationManager
                             ->title('Submitted for review')
                             ->success()
                             ->send();
+
+                        $this->skipRender();
                     }),
                 Action::make('play')
                     ->label('Audio')
@@ -231,12 +235,20 @@ class RecitationsRelationManager extends RelationManager
                     ->successRedirectUrl(fn (): string => '')
                     ->mutateFormDataUsing(function (array $data, Recitation $record): array {
                         return $this->applyAudioMetadata($data, $record);
+                    })
+                    ->after(function (): void {
+                        $this->skipRender();
                     }),
                 DeleteAction::make()
-                    ->successRedirectUrl(fn (): string => \App\Filament\Resources\Reciters\ReciterResource::getUrl(
-                        'edit',
-                        ['record' => $this->getOwnerRecord()],
-                    )),
+                    ->successRedirectUrl(fn (): string => '')
+                    ->after(function (): void {
+                        Notification::make()
+                            ->title('Recitation deleted')
+                            ->success()
+                            ->send();
+
+                        $this->skipRender();
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
