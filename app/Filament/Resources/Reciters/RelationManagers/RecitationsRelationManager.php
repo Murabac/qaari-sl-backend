@@ -81,8 +81,6 @@ class RecitationsRelationManager extends RelationManager
                         ])
                         ->maxSize(204800)
                         ->required()
-                        ->downloadable()
-                        ->openable()
                         ->afterStateUpdated(function ($state, callable $set, callable $get): void {
                             // Only analyze freshly uploaded temp files — not existing R2 paths on edit hydrate.
                             if (! ($state instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
@@ -174,8 +172,10 @@ class RecitationsRelationManager extends RelationManager
                 CreateAction::make()
                     ->label('Add surah')
                     ->createAnother(false)
-                    // Avoid Filament bug: getHasActionsLivewire() can be null after modal create.
-                    ->successRedirectUrl(fn (): string => '')
+                    ->successRedirectUrl(fn (): string => \App\Filament\Resources\Reciters\ReciterResource::getUrl(
+                        'edit',
+                        ['record' => $this->getOwnerRecord()],
+                    ))
                     ->mutateFormDataUsing(function (array $data): array {
                         $data = $this->applyAudioMetadata($data);
                         $data['created_by'] = Auth::id();
@@ -230,7 +230,10 @@ class RecitationsRelationManager extends RelationManager
                     ->openUrlInNewTab()
                     ->visible(fn (Recitation $record): bool => filled($record->audio_url)),
                 EditAction::make()
-                    ->successRedirectUrl(fn (): string => '')
+                    ->successRedirectUrl(fn (): string => \App\Filament\Resources\Reciters\ReciterResource::getUrl(
+                        'edit',
+                        ['record' => $this->getOwnerRecord()],
+                    ))
                     ->mutateFormDataUsing(function (array $data, Recitation $record): array {
                         return $this->applyAudioMetadata($data, $record);
                     }),

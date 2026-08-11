@@ -70,7 +70,6 @@ class StoryTeamMemberResource extends Resource
                     ->visibility('private')
                     ->directory('story/team')
                     ->image()
-                    ->imageEditor()
                     ->avatar()
                     ->maxSize(5120)
                     ->fetchFileInformation(false)
@@ -114,11 +113,14 @@ class StoryTeamMemberResource extends Resource
             ->defaultSort('sort_order')
             ->recordActionsColumnLabel('Actions')
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->successRedirectUrl(StoryTeamMemberResource::getUrl('index')),
+                DeleteAction::make()
+                    ->successRedirectUrl(StoryTeamMemberResource::getUrl('index')),
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->successRedirectUrl(StoryTeamMemberResource::getUrl('index')),
             ]);
     }
 

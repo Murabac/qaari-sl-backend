@@ -89,8 +89,6 @@ class RecitationForm
                                 ])
                                 ->maxSize(204800)
                                 ->required()
-                                ->downloadable()
-                                ->openable()
                                 ->afterStateUpdated(function ($state, callable $set): void {
                                     if (! ($state instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
                                         && ! (is_array($state) && ($state[0] ?? null) instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)

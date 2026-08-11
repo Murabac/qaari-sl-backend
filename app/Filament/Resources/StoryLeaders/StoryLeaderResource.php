@@ -73,7 +73,6 @@ class StoryLeaderResource extends Resource
                     ->visibility('private')
                     ->directory('story/leaders')
                     ->image()
-                    ->imageEditor()
                     ->avatar()
                     ->maxSize(5120)
                     ->fetchFileInformation(false)
@@ -119,11 +118,14 @@ class StoryLeaderResource extends Resource
             ->defaultSort('sort_order')
             ->recordActionsColumnLabel('Actions')
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->successRedirectUrl(StoryLeaderResource::getUrl('index')),
+                DeleteAction::make()
+                    ->successRedirectUrl(StoryLeaderResource::getUrl('index')),
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->successRedirectUrl(StoryLeaderResource::getUrl('index')),
             ]);
     }
 

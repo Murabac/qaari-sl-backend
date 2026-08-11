@@ -58,7 +58,6 @@ class ReciterForm
                                 ->label('Photo')
                                 ->directory('reciters/photos')
                                 ->image()
-                                ->imageEditor()
                                 ->maxSize(5120)
                                 ->columnSpanFull(),
                         ),

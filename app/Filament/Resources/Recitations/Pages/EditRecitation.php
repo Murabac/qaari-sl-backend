@@ -164,6 +164,11 @@ class EditRecitation extends EditRecord
         ];
     }
 
+    protected function getRedirectUrl(): string
+    {
+        return RecitationResource::getUrl('index');
+    }
+
     /**
      * Save hand-marked ayah starts without re-rendering the Filament page.
      * Re-rendering embeds the full surah text again and was returning 500 on Coolify.

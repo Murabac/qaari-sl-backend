@@ -17,5 +17,6 @@ class FilamentR2FileUploadTest extends TestCase
         $this->assertSame('r2', $upload->getDiskName());
         $this->assertSame('private', $upload->getVisibility());
         $this->assertFalse($upload->shouldFetchFileInformation());
+        $this->assertFalse($upload->isPreviewable());
     }
 }

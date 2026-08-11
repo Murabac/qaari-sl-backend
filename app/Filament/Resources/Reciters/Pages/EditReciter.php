@@ -17,4 +17,9 @@ class EditReciter extends EditRecord
                 ->successRedirectUrl(ReciterResource::getUrl('index')),
         ];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return ReciterResource::getUrl('index');
+    }
 }

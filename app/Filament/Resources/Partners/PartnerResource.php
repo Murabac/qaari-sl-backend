@@ -67,7 +67,6 @@ class PartnerResource extends Resource
                     ->visibility('private')
                     ->directory('partners/logos')
                     ->image()
-                    ->imageEditor()
                     ->maxSize(5120)
                     ->fetchFileInformation(false)
                     ->getUploadedFileUsing(function (BaseFileUpload $component, string $file, string|array|null $storedFileNames): ?array {
@@ -108,11 +107,14 @@ class PartnerResource extends Resource
             ->defaultSort('sort_order')
             ->recordActionsColumnLabel('Actions')
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->successRedirectUrl(PartnerResource::getUrl('index')),
+                DeleteAction::make()
+                    ->successRedirectUrl(PartnerResource::getUrl('index')),
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->successRedirectUrl(PartnerResource::getUrl('index')),
             ]);
     }
 
