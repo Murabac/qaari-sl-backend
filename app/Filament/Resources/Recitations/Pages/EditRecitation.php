@@ -86,8 +86,6 @@ class EditRecitation extends EditRecord
                         ->body('Automatic matching can take a few minutes on the server. Refresh this page later to see the result.')
                         ->success()
                         ->send();
-
-                    $this->skipRender();
                 }),
             Action::make('replaceManualWithAutoSync')
                 ->label('Start over with automatic matching')
@@ -116,8 +114,6 @@ class EditRecitation extends EditRecord
                         ->body('Your hand-marked ayahs were cleared. Refresh in a few minutes for the new result.')
                         ->success()
                         ->send();
-
-                    $this->skipRender();
                 }),
             Action::make('queueSync')
                 ->label('Match in the background')
@@ -139,16 +135,17 @@ class EditRecitation extends EditRecord
                         ->body('You can keep working. Refresh this page in a few minutes to see the result.')
                         ->success()
                         ->send();
-
-                    $this->skipRender();
                 }),
             Action::make('submitForReview')
                 ->label('Submit for review')
                 ->icon('heroicon-o-paper-airplane')
                 ->color('warning')
                 ->requiresConfirmation()
-                ->visible(fn (): bool => Auth::user()?->can('submit', $record) ?? false)
-                ->action(function () use ($record): void {
+                ->visible(fn (): bool => Auth::user()?->can('submit', $this->getRecord()) ?? false)
+                ->action(function (): void {
+                    /** @var Recitation $record */
+                    $record = $this->getRecord();
+
                     $record->update([
                         'status' => RecitationStatus::PendingReview,
                         'submitted_at' => now(),
@@ -159,15 +156,19 @@ class EditRecitation extends EditRecord
                         ->success()
                         ->send();
 
-                    $this->skipRender();
+                    // Full redirect closes the confirm modal and refreshes header actions.
+                    $this->redirect(RecitationResource::getUrl('index'));
                 }),
             Action::make('reopen')
                 ->label('Reopen to draft')
                 ->icon('heroicon-o-arrow-path')
                 ->color('gray')
                 ->requiresConfirmation()
-                ->visible(fn (): bool => Auth::user()?->can('reopen', $record) ?? false)
-                ->action(function () use ($record): void {
+                ->visible(fn (): bool => Auth::user()?->can('reopen', $this->getRecord()) ?? false)
+                ->action(function (): void {
+                    /** @var Recitation $record */
+                    $record = $this->getRecord();
+
                     $record->update([
                         'status' => RecitationStatus::Draft,
                         'submitted_at' => null,
@@ -180,7 +181,7 @@ class EditRecitation extends EditRecord
                         ->success()
                         ->send();
 
-                    $this->skipRender();
+                    $this->redirect(RecitationResource::getUrl('edit', ['record' => $record]));
                 }),
             DeleteAction::make()
                 ->successRedirectUrl(RecitationResource::getUrl('index')),
