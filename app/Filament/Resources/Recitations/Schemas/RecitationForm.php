@@ -3,12 +3,10 @@
 namespace App\Filament\Resources\Recitations\Schemas;
 
 use App\Enums\RecitationStatus;
-use App\Models\Ayah;
 use App\Models\Recitation;
 use App\Models\User;
 use App\Support\AudioMetadata;
 use App\Support\FilamentR2FileUpload;
-use App\Support\MediaUrl;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
@@ -113,9 +111,7 @@ class RecitationForm
                     ]),
                 Section::make('Review notes')
                     ->columnSpanFull()
-                    ->visible(fn (?Recitation $record): bool => $record !== null
-                        && ! request()->hasHeader('X-Livewire')
-                        && (($record->reviewNotes()?->exists()) ?? false))
+                    ->visible(fn (?Recitation $record): bool => ($record?->reviewNotes()?->exists()) ?? false)
                     ->schema([
                         ViewField::make('review_notes_panel')
                             ->label('')
@@ -123,65 +119,6 @@ class RecitationForm
                             ->viewData(fn (?Recitation $record): array => [
                                 'notes' => $record?->reviewNotes()->with('user')->get() ?? collect(),
                             ])
-                            ->dehydrated(false)
-                            ->columnSpanFull(),
-                    ]),
-                Section::make('Help listeners follow along')
-                    ->description('Mark when each ayah begins in the audio. You can save and finish later.')
-                    ->columnSpanFull()
-                    // Full page loads only — skip on Livewire save morph (Coolify 500).
-                    ->visible(fn (?Recitation $record): bool => $record !== null && ! request()->hasHeader('X-Livewire'))
-                    ->schema([
-                        ViewField::make('ayah_sync_panel')
-                            ->label('')
-                            ->view('filament.forms.ayah-sync-panel')
-                            ->viewData(function (?Recitation $record): array {
-                                if ($record === null) {
-                                    return [
-                                        'record' => null,
-                                        'ayahRows' => [],
-                                        'timingRows' => [],
-                                        'audioUrl' => null,
-                                    ];
-                                }
-
-                                // Query separately — never loadMissing onto $record.
-                                // Livewire dehydrates EditRecord::$record; attaching surah.ayahs
-                                // makes Coolify return 500 on Save (snapshot too large).
-                                $ayahRows = Ayah::query()
-                                    ->where('surah_id', $record->surah_id)
-                                    ->orderBy('number')
-                                    ->get(['number', 'text_uthmani'])
-                                    ->map(fn (Ayah $a): array => [
-                                        'n' => (int) $a->number,
-                                        't' => (string) $a->text_uthmani,
-                                    ])
-                                    ->values()
-                                    ->all();
-
-                                $timingRows = $record->ayahTimings()
-                                    ->orderBy('ayah_number')
-                                    ->get(['ayah_number', 'start_ms', 'end_ms'])
-                                    ->map(fn ($t): array => [
-                                        'ayah_number' => (int) $t->ayah_number,
-                                        'start_ms' => (int) $t->start_ms,
-                                        'end_ms' => (int) $t->end_ms,
-                                    ])
-                                    ->values()
-                                    ->all();
-
-                                return [
-                                    'record' => $record,
-                                    'ayahRows' => $ayahRows,
-                                    'timingRows' => $timingRows,
-                                    'audioUrl' => filled($record->audio_url)
-                                        ? MediaUrl::temporary('r2', $record->audio_url)
-                                        : null,
-                                    'verseCount' => (int) ($record->surah()->value('verse_count')
-                                        ?: count($ayahRows)
-                                        ?: 1),
-                                ];
-                            })
                             ->dehydrated(false)
                             ->columnSpanFull(),
                     ]),

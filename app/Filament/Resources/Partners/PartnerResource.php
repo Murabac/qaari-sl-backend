@@ -4,12 +4,12 @@ namespace App\Filament\Resources\Partners;
 
 use App\Filament\Resources\Partners\Pages\ManagePartners;
 use App\Models\Partner;
+use App\Support\FilamentR2FileUpload;
 use App\Support\MediaUrl;
 use BackedEnum;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -61,29 +61,14 @@ class PartnerResource extends Resource
                     ->numeric()
                     ->default(0)
                     ->required(),
-                FileUpload::make('logo_url')
-                    ->label('Logo')
-                    ->disk('r2')
-                    ->visibility('private')
-                    ->directory('partners/logos')
-                    ->image()
-                    ->maxSize(5120)
-                    ->fetchFileInformation(false)
-                    ->getUploadedFileUsing(function (BaseFileUpload $component, string $file, string|array|null $storedFileNames): ?array {
-                        $url = MediaUrl::temporary('r2', $file);
-
-                        if (blank($url)) {
-                            return null;
-                        }
-
-                        return [
-                            'name' => is_array($storedFileNames) ? ($storedFileNames[$file] ?? basename($file)) : ($storedFileNames ?: basename($file)),
-                            'size' => 0,
-                            'type' => null,
-                            'url' => $url,
-                        ];
-                    })
-                    ->columnSpanFull(),
+                FilamentR2FileUpload::configure(
+                    FileUpload::make('logo_url')
+                        ->label('Logo')
+                        ->directory('partners/logos')
+                        ->image()
+                        ->maxSize(5120)
+                        ->columnSpanFull(),
+                ),
                 Toggle::make('is_active')
                     ->label('Visible on homepage')
                     ->default(true),

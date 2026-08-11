@@ -56,7 +56,9 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
-            'throw' => true,
+            // false: Filament FileUpload only catches some Flysystem exceptions;
+            // with throw=true, R2 blips become hard 500s after a successful save.
+            'throw' => false,
             'report' => false,
         ],
 
@@ -70,7 +72,7 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
-            'throw' => true,
+            'throw' => false,
             'report' => false,
         ],
 

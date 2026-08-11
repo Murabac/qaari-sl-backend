@@ -4,25 +4,53 @@ namespace App\Filament\Resources\Recitations\Pages;
 
 use App\Enums\RecitationStatus;
 use App\Enums\SyncStatus;
+use App\Filament\Concerns\SkipsRenderAfterSuccessfulSave;
 use App\Filament\Resources\Recitations\RecitationResource;
 use App\Jobs\SyncRecitationAyahTimingsJob;
+use App\Livewire\RecitationAyahSyncPanel;
 use App\Models\Recitation;
-use App\Services\AyahTimingSyncService;
 use App\Support\AudioMetadata;
 use App\Support\MediaUrl;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\EmbeddedSchema;
+use Filament\Schemas\Components\Form;
+use Filament\Schemas\Components\Livewire as LivewireSchemaComponent;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Livewire\Attributes\Renderless;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
-use Throwable;
 
 class EditRecitation extends EditRecord
 {
+    use SkipsRenderAfterSuccessfulSave;
+
     protected static string $resource = RecitationResource::class;
+
+    public function content(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                $this->getFormContentComponent(),
+                // Nested Livewire keeps ~6k ayah rows out of the edit-page snapshot.
+                LivewireSchemaComponent::make(RecitationAyahSyncPanel::class)
+                    ->lazy()
+                    ->key(fn (): string => 'ayah-sync-'.$this->getRecord()->getKey()),
+                $this->getRelationManagersContentComponent(),
+            ]);
+    }
+
+    public function getFormContentComponent(): Component
+    {
+        return Form::make([EmbeddedSchema::make('form')])
+            ->id('form')
+            ->livewireSubmitHandler('save')
+            ->footer([
+                $this->getFormActionsContentComponent(),
+            ]);
+    }
 
     protected function getHeaderActions(): array
     {
@@ -59,8 +87,7 @@ class EditRecitation extends EditRecord
                         ->success()
                         ->send();
 
-                    $this->stripHeavyRecordRelations();
-                    $this->redirect(static::getUrl(['record' => $record]), navigate: true);
+                    $this->skipRender();
                 }),
             Action::make('replaceManualWithAutoSync')
                 ->label('Start over with automatic matching')
@@ -90,8 +117,7 @@ class EditRecitation extends EditRecord
                         ->success()
                         ->send();
 
-                    $this->stripHeavyRecordRelations();
-                    $this->redirect(static::getUrl(['record' => $record]), navigate: true);
+                    $this->skipRender();
                 }),
             Action::make('queueSync')
                 ->label('Match in the background')
@@ -114,8 +140,7 @@ class EditRecitation extends EditRecord
                         ->success()
                         ->send();
 
-                    $this->stripHeavyRecordRelations();
-                    $this->redirect(static::getUrl(['record' => $record]), navigate: true);
+                    $this->skipRender();
                 }),
             Action::make('submitForReview')
                 ->label('Submit for review')
@@ -134,8 +159,7 @@ class EditRecitation extends EditRecord
                         ->success()
                         ->send();
 
-                    $this->stripHeavyRecordRelations();
-                    $this->redirect(static::getUrl(['record' => $record]), navigate: true);
+                    $this->skipRender();
                 }),
             Action::make('reopen')
                 ->label('Reopen to draft')
@@ -156,82 +180,11 @@ class EditRecitation extends EditRecord
                         ->success()
                         ->send();
 
-                    $this->stripHeavyRecordRelations();
-                    $this->redirect(static::getUrl(['record' => $record]), navigate: true);
+                    $this->skipRender();
                 }),
             DeleteAction::make()
                 ->successRedirectUrl(RecitationResource::getUrl('index')),
         ];
-    }
-
-    public function save(bool $shouldRedirect = true, bool $shouldSendSavedNotification = true): void
-    {
-        // Let Filament save without its own redirect, then force a full document
-        // navigation. Coolify returns 500 when Livewire tries to morph this page
-        // (R2 FileUpload + ayah panel) even though the DB write already succeeded.
-        parent::save(shouldRedirect: false, shouldSendSavedNotification: $shouldSendSavedNotification);
-
-        if ($shouldRedirect) {
-            $this->redirect(static::getUrl(['record' => $this->getRecord()]), navigate: false);
-        }
-    }
-
-    protected function getRedirectUrl(): ?string
-    {
-        return null;
-    }
-
-    /**
-     * Save hand-marked ayah starts without re-rendering the Filament page.
-     * Re-rendering embeds the full surah text again and was returning 500 on Coolify.
-     *
-     * @param  list<float|int|string>|array<mixed>  $startsSeconds
-     */
-    #[Renderless]
-    public function saveManualTimings(mixed $startsSeconds = [], mixed $resumeAyah = null): void
-    {
-        try {
-            $starts = collect(is_array($startsSeconds) ? $startsSeconds : [])
-                ->map(fn ($value): float => round((float) $value, 3))
-                ->values()
-                ->all();
-
-            $resume = ($resumeAyah === null || $resumeAyah === '')
-                ? null
-                : (int) $resumeAyah;
-
-            /** @var Recitation $record */
-            $record = $this->getRecord();
-
-            app(AyahTimingSyncService::class)->saveManualTimings(
-                $record->fresh(),
-                $starts,
-                $resume,
-            );
-
-            Notification::make()
-                ->title('Progress saved')
-                ->body(
-                    $resume
-                        ? "All set. Next time we’ll open ayah {$resume} for you."
-                        : 'All set. You can leave and continue later anytime.'
-                )
-                ->success()
-                ->send();
-        } catch (Throwable $e) {
-            Log::error('saveManualTimings failed', [
-                'recitation_id' => $this->record?->getKey(),
-                'starts_count' => is_array($startsSeconds) ? count($startsSeconds) : null,
-                'error' => $e->getMessage(),
-            ]);
-            report($e);
-
-            Notification::make()
-                ->title('Could not save timings')
-                ->body($e->getMessage())
-                ->danger()
-                ->send();
-        }
     }
 
     /**
@@ -265,22 +218,5 @@ class EditRecitation extends EditRecord
         $data['file_size'] = $meta['file_size'] ?? $record->file_size;
 
         return $data;
-    }
-
-    protected function afterSave(): void
-    {
-        $this->stripHeavyRecordRelations();
-    }
-
-    private function stripHeavyRecordRelations(): void
-    {
-        if (! $this->record instanceof Recitation) {
-            return;
-        }
-
-        $this->record->unsetRelation('ayahTimings');
-        $this->record->unsetRelation('surah');
-        $this->record->unsetRelation('reviewNotes');
-        $this->record->unsetRelation('reciter');
     }
 }

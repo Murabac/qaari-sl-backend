@@ -19,13 +19,13 @@ class FilamentR2FileUpload
             ->visibility('private')
             ->fetchFileInformation(false)
             ->previewable(false)
+            ->openable(false)
+            ->downloadable(false)
             ->getUploadedFileUsing(function (BaseFileUpload $component, string $file, string|array|null $storedFileNames): ?array {
                 try {
+                    // Never call Storage::size()/mimeType()/exists() here — those
+                    // HEAD requests against private R2 are what 500 Coolify remorphs.
                     $url = MediaUrl::temporary('r2', $file);
-
-                    if (blank($url)) {
-                        return null;
-                    }
 
                     $name = is_array($storedFileNames)
                         ? ($storedFileNames[$file] ?? basename($file))
@@ -38,7 +38,12 @@ class FilamentR2FileUpload
                         'url' => $url,
                     ];
                 } catch (\Throwable) {
-                    return null;
+                    return [
+                        'name' => basename($file),
+                        'size' => 0,
+                        'type' => null,
+                        'url' => null,
+                    ];
                 }
             });
     }

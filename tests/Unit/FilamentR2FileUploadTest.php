@@ -18,5 +18,7 @@ class FilamentR2FileUploadTest extends TestCase
         $this->assertSame('private', $upload->getVisibility());
         $this->assertFalse($upload->shouldFetchFileInformation());
         $this->assertFalse($upload->isPreviewable());
+        $this->assertFalse($upload->isOpenable());
+        $this->assertFalse($upload->isDownloadable());
     }
 }
