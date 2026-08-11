@@ -172,10 +172,8 @@ class RecitationsRelationManager extends RelationManager
                 CreateAction::make()
                     ->label('Add surah')
                     ->createAnother(false)
-                    ->successRedirectUrl(fn (): string => \App\Filament\Resources\Reciters\ReciterResource::getUrl(
-                        'edit',
-                        ['record' => $this->getOwnerRecord()],
-                    ))
+                    // Empty URL = no redirect (avoids Filament null Livewire crash after modal save).
+                    ->successRedirectUrl(fn (): string => '')
                     ->mutateFormDataUsing(function (array $data): array {
                         $data = $this->applyAudioMetadata($data);
                         $data['created_by'] = Auth::id();
@@ -230,10 +228,7 @@ class RecitationsRelationManager extends RelationManager
                     ->openUrlInNewTab()
                     ->visible(fn (Recitation $record): bool => filled($record->audio_url)),
                 EditAction::make()
-                    ->successRedirectUrl(fn (): string => \App\Filament\Resources\Reciters\ReciterResource::getUrl(
-                        'edit',
-                        ['record' => $this->getOwnerRecord()],
-                    ))
+                    ->successRedirectUrl(fn (): string => '')
                     ->mutateFormDataUsing(function (array $data, Recitation $record): array {
                         return $this->applyAudioMetadata($data, $record);
                     }),

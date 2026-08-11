@@ -56,11 +56,6 @@ class AdminPanelProvider extends PanelProvider
                 PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
                 fn (): string => view('filament.auth.demo-login-button')->render(),
             )
-            // After save/create, leave the heavy edit form. Staying on the page
-            // re-renders private R2 FileUploads and 500s on Coolify even though
-            // the row already saved (the overlay dismisses if you click outside).
-            ->resourceCreatePageRedirect('index')
-            ->resourceEditPageRedirect('index')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([

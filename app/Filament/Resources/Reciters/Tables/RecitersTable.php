@@ -96,8 +96,7 @@ class RecitersTable
             ->recordActionsColumnLabel('Actions')
             ->recordActions([
                 EditAction::make(),
-                DeleteAction::make()
-                    ->successRedirectUrl(ReciterResource::getUrl('index')),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

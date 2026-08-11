@@ -113,7 +113,9 @@ class RecitationForm
                     ]),
                 Section::make('Review notes')
                     ->columnSpanFull()
-                    ->visible(fn (?Recitation $record): bool => ($record?->reviewNotes()?->exists()) ?? false)
+                    ->visible(fn (?Recitation $record): bool => $record !== null
+                        && ! request()->hasHeader('X-Livewire')
+                        && (($record->reviewNotes()?->exists()) ?? false))
                     ->schema([
                         ViewField::make('review_notes_panel')
                             ->label('')
@@ -127,7 +129,8 @@ class RecitationForm
                 Section::make('Help listeners follow along')
                     ->description('Mark when each ayah begins in the audio. You can save and finish later.')
                     ->columnSpanFull()
-                    ->visible(fn (?Recitation $record): bool => $record !== null)
+                    // Full page loads only — skip on Livewire save morph (Coolify 500).
+                    ->visible(fn (?Recitation $record): bool => $record !== null && ! request()->hasHeader('X-Livewire'))
                     ->schema([
                         ViewField::make('ayah_sync_panel')
                             ->label('')

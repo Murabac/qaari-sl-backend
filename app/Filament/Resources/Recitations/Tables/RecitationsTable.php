@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Recitations\Tables;
 
 use App\Enums\RecitationStatus;
-use App\Filament\Resources\Recitations\RecitationResource;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -115,8 +114,7 @@ class RecitationsTable
             ->recordActionsColumnLabel('Actions')
             ->recordActions([
                 EditAction::make(),
-                DeleteAction::make()
-                    ->successRedirectUrl(RecitationResource::getUrl('index')),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -164,9 +164,21 @@ class EditRecitation extends EditRecord
         ];
     }
 
-    protected function getRedirectUrl(): string
+    public function save(bool $shouldRedirect = true, bool $shouldSendSavedNotification = true): void
     {
-        return RecitationResource::getUrl('index');
+        // Let Filament save without its own redirect, then force a full document
+        // navigation. Coolify returns 500 when Livewire tries to morph this page
+        // (R2 FileUpload + ayah panel) even though the DB write already succeeded.
+        parent::save(shouldRedirect: false, shouldSendSavedNotification: $shouldSendSavedNotification);
+
+        if ($shouldRedirect) {
+            $this->redirect(static::getUrl(['record' => $this->getRecord()]), navigate: false);
+        }
+    }
+
+    protected function getRedirectUrl(): ?string
+    {
+        return null;
     }
 
     /**

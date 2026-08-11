@@ -107,14 +107,11 @@ class PartnerResource extends Resource
             ->defaultSort('sort_order')
             ->recordActionsColumnLabel('Actions')
             ->recordActions([
-                EditAction::make()
-                    ->successRedirectUrl(PartnerResource::getUrl('index')),
-                DeleteAction::make()
-                    ->successRedirectUrl(PartnerResource::getUrl('index')),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->successRedirectUrl(PartnerResource::getUrl('index')),
+                CreateAction::make(),
             ]);
     }
 

@@ -10,6 +10,15 @@ class EditReciter extends EditRecord
 {
     protected static string $resource = ReciterResource::class;
 
+    public function save(bool $shouldRedirect = true, bool $shouldSendSavedNotification = true): void
+    {
+        parent::save(shouldRedirect: false, shouldSendSavedNotification: $shouldSendSavedNotification);
+
+        if ($shouldRedirect) {
+            $this->redirect(static::getUrl(['record' => $this->getRecord()]), navigate: false);
+        }
+    }
+
     protected function getHeaderActions(): array
     {
         return [
@@ -18,8 +27,8 @@ class EditReciter extends EditRecord
         ];
     }
 
-    protected function getRedirectUrl(): string
+    protected function getRedirectUrl(): ?string
     {
-        return ReciterResource::getUrl('index');
+        return null;
     }
 }

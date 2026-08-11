@@ -113,14 +113,11 @@ class StoryTeamMemberResource extends Resource
             ->defaultSort('sort_order')
             ->recordActionsColumnLabel('Actions')
             ->recordActions([
-                EditAction::make()
-                    ->successRedirectUrl(StoryTeamMemberResource::getUrl('index')),
-                DeleteAction::make()
-                    ->successRedirectUrl(StoryTeamMemberResource::getUrl('index')),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->successRedirectUrl(StoryTeamMemberResource::getUrl('index')),
+                CreateAction::make(),
             ]);
     }
 

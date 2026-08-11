@@ -118,14 +118,11 @@ class StoryLeaderResource extends Resource
             ->defaultSort('sort_order')
             ->recordActionsColumnLabel('Actions')
             ->recordActions([
-                EditAction::make()
-                    ->successRedirectUrl(StoryLeaderResource::getUrl('index')),
-                DeleteAction::make()
-                    ->successRedirectUrl(StoryLeaderResource::getUrl('index')),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->successRedirectUrl(StoryLeaderResource::getUrl('index')),
+                CreateAction::make(),
             ]);
     }
 

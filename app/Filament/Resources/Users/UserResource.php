@@ -80,7 +80,6 @@ class UserResource extends Resource
             ->recordActionsColumnLabel('Actions')
             ->headerActions([
                 CreateAction::make()
-                    ->successRedirectUrl(UserResource::getUrl('index'))
                     ->using(function (array $data): Model {
                         $role = $data['staff_role'] ?? null;
                         unset($data['staff_role']);
@@ -97,7 +96,6 @@ class UserResource extends Resource
             ])
             ->recordActions([
                 EditAction::make()
-                    ->successRedirectUrl(UserResource::getUrl('index'))
                     ->mutateRecordDataUsing(function (array $data, User $record): array {
                         $data['staff_role'] = $record->roles->first()?->name;
 
@@ -115,8 +113,7 @@ class UserResource extends Resource
 
                         return $record;
                     }),
-                DeleteAction::make()
-                    ->successRedirectUrl(UserResource::getUrl('index')),
+                DeleteAction::make(),
             ]);
     }
 
