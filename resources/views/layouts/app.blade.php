@@ -12,6 +12,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', __('site.footer_brand'))</title>
     @yield('meta')
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/apple-touch-icon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
@@ -39,7 +43,17 @@
     >
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
             <a href="{{ route('home') }}" class="flex items-center gap-3">
-                <img src="{{ asset('images/logo.svg') }}" alt="{{ __('site.footer_brand') }}" class="h-10 w-10">
+                <img
+                    alt="{{ __('site.footer_brand') }}"
+                    class="h-14 w-14 shrink-0 sm:h-16 sm:w-16"
+                    width="64"
+                    height="64"
+                    style="width:3.5rem;height:3.5rem"
+                    x-bind:src="(scrolled || {{ $solidHeader ? 'true' : 'false' }})
+                        ? '{{ asset('images/logo-mark.png') }}'
+                        : '{{ asset('images/logo-mark-light.png') }}'"
+                    src="{{ asset($solidHeader ? 'images/logo-mark.png' : 'images/logo-mark-light.png') }}"
+                >
                 <span
                     class="font-display text-lg font-semibold tracking-tight transition"
                     x-bind:class="(scrolled || {{ $solidHeader ? 'true' : 'false' }}) ? 'text-qaari-primary' : 'text-qaari-primary-fg'"
@@ -165,7 +179,7 @@
     <footer class="mt-auto border-t border-qaari-border bg-qaari-primary text-qaari-primary-fg">
         <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div class="flex items-center gap-3">
-                <img src="{{ asset('images/logo.svg') }}" alt="" class="h-8 w-8">
+                <img src="{{ asset('images/logo-mark-light.png') }}" alt="" class="h-12 w-12 shrink-0" width="48" height="48" style="width:3rem;height:3rem">
                 <span class="font-display text-lg font-semibold">{{ __('site.footer_brand') }}</span>
             </div>
             <div class="max-w-xl space-y-2">

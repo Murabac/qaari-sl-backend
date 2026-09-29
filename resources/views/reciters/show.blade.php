@@ -48,7 +48,7 @@
                     <img src="{{ $photoUrl }}" alt="{{ LocaleText::reciterName($reciter) }}" class="h-full w-full object-cover">
                 @else
                     <div class="flex h-full items-center justify-center">
-                        <img src="{{ asset('images/logo.svg') }}" alt="" class="h-16 w-16 opacity-70">
+                        <img src="{{ asset('images/logo-mark.png') }}" alt="" class="h-16 w-16 opacity-70">
                     </div>
                 @endif
             </div>

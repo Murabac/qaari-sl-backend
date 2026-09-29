@@ -22,7 +22,7 @@
             </p>
 
             <div class="mb-4 flex justify-center">
-                <img src="{{ asset('images/logo.svg') }}" alt="{{ __('site.footer_brand') }}" class="h-20 w-20 drop-shadow-lg">
+                <img src="{{ asset('images/logo-mark-light.png') }}" alt="{{ __('site.footer_brand') }}" class="h-28 w-28 drop-shadow-lg" width="112" height="112" style="width:7rem;height:7rem">
             </div>
 
             <h1 class="font-display mb-6 whitespace-pre-line text-4xl font-bold leading-[1.15] text-qaari-primary-fg sm:text-5xl lg:text-[3.6rem]">
@@ -103,7 +103,7 @@
                                     <img src="{{ $photo }}" alt="{{ LocaleText::reciterName($reciter) }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                                 @else
                                     <div class="flex h-full items-center justify-center">
-                                        <img src="{{ asset('images/logo.svg') }}" alt="" class="h-16 w-16 opacity-70">
+                                        <img src="{{ asset('images/logo-mark.png') }}" alt="" class="h-16 w-16 opacity-70">
                                     </div>
                                 @endif
                                 <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-qaari-deep/80 to-transparent p-4 pt-16">

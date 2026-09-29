@@ -28,7 +28,7 @@ class RecitersTable
                     ->checkFileExistence(false)
                     ->getStateUsing(fn (Reciter $record): ?string => MediaUrl::temporary('r2', $record->photo_url))
                     ->circular()
-                    ->defaultImageUrl(asset('images/logo.svg')),
+                    ->defaultImageUrl(asset('images/logo-mark.png')),
                 TextColumn::make('name_english')
                     ->label('English')
                     ->searchable()

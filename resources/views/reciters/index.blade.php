@@ -64,7 +64,7 @@
                                     <img src="{{ $photo }}" alt="{{ LocaleText::reciterName($reciter) }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                                 @else
                                     <div class="flex h-full items-center justify-center">
-                                        <img src="{{ asset('images/logo.svg') }}" alt="" class="h-14 w-14 opacity-70">
+                                        <img src="{{ asset('images/logo-mark.png') }}" alt="" class="h-14 w-14 opacity-70">
                                     </div>
                                 @endif
                             </div>

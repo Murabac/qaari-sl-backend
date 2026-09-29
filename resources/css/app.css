@@ -12,14 +12,14 @@
     --color-qaari-bg: #f7f4ee;
     --color-qaari-fg: #1a2416;
     --color-qaari-card: #fefcf8;
-    --color-qaari-primary: #1b3a2e;
+    --color-qaari-primary: #0c403e;
     --color-qaari-primary-fg: #f7f4ee;
     --color-qaari-accent: #c9a24b;
     --color-qaari-accent-hover: #d4af5a;
     --color-qaari-muted: #6b6252;
-    --color-qaari-deep: #0a1c11;
-    --color-qaari-soft: #2e5e48;
-    --color-qaari-border: rgba(27, 58, 46, 0.12);
+    --color-qaari-deep: #062423;
+    --color-qaari-soft: #1c5a58;
+    --color-qaari-border: rgba(12, 64, 62, 0.12);
 }
 
 @layer base {
@@ -47,7 +47,7 @@
     }
 
     .qaari-pattern-dark {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg stroke='%231B3A2E' stroke-width='0.7' fill='none'%3E%3Crect x='20' y='20' width='40' height='40' opacity='0.12'/%3E%3Crect x='20' y='20' width='40' height='40' transform='rotate(45 40 40)' opacity='0.12'/%3E%3C/g%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg stroke='%230C403E' stroke-width='0.7' fill='none'%3E%3Crect x='20' y='20' width='40' height='40' opacity='0.12'/%3E%3Crect x='20' y='20' width='40' height='40' transform='rotate(45 40 40)' opacity='0.12'/%3E%3C/g%3E%3C/svg%3E");
     }
 
     .qaari-pattern-gold {

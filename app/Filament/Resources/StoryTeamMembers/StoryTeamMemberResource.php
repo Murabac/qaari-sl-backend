@@ -88,7 +88,7 @@ class StoryTeamMemberResource extends Resource
                     ->circular()
                     ->checkFileExistence(false)
                     ->getStateUsing(fn (StoryTeamMember $record): ?string => MediaUrl::temporary('r2', $record->photo_url))
-                    ->defaultImageUrl(asset('images/logo.svg')),
+                    ->defaultImageUrl(asset('images/logo-mark.png')),
                 TextColumn::make('name')->searchable()->sortable(),
                 TextColumn::make('role')->limit(40),
                 TextColumn::make('description')->limit(50)->toggleable(),

@@ -83,7 +83,7 @@ class PartnerResource extends Resource
                     ->label('Logo')
                     ->checkFileExistence(false)
                     ->getStateUsing(fn (Partner $record): ?string => MediaUrl::temporary('r2', $record->logo_url))
-                    ->defaultImageUrl(asset('images/logo.svg')),
+                    ->defaultImageUrl(asset('images/logo-mark.png')),
                 TextColumn::make('name')->searchable()->sortable(),
                 TextColumn::make('url')->limit(40)->toggleable(),
                 TextColumn::make('sort_order')->label('Order')->sortable(),

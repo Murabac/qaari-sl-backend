@@ -5,7 +5,7 @@
     --qaari-bg: #f7f4ee;
     --qaari-fg: #1a2416;
     --qaari-card: #fefcf8;
-    --qaari-primary: #1b3a2e;
+    --qaari-primary: #0c403e;
     --qaari-primary-fg: #f7f4ee;
     --qaari-secondary: #e8efe9;
     --qaari-muted: #d9e5de;
@@ -13,12 +13,12 @@
     --qaari-accent: #c9a24b;
     --qaari-accent-fg: #1a2416;
     --qaari-danger: #c0392b;
-    --qaari-border: rgba(27, 58, 46, 0.12);
+    --qaari-border: rgba(12, 64, 62, 0.12);
     --qaari-input: #eef3f0;
     --qaari-sidebar: #f0ede6;
     --qaari-sidebar-accent: #ede9e0;
-    --qaari-ring: #4a7a62;
-    --qaari-soft: #2e5e48;
+    --qaari-ring: #1c5a58;
+    --qaari-soft: #1c5a58;
     --qaari-header: #e3ece7;
     --qaari-radius: 0.75rem;
 }
@@ -422,7 +422,7 @@ textarea.fi-textarea:focus {
 }
 
 .qaari-player__shell {
-    background: #0a1c11;
+    background: #062423;
     border: 1px solid rgba(201, 162, 75, 0.18);
     border-radius: 1rem;
     overflow: hidden;
@@ -547,7 +547,7 @@ textarea.fi-textarea:focus {
     height: 2.85rem;
     border: 0;
     border-radius: 999px;
-    background: #2e5e48;
+    background: #1c5a58;
     color: #ffffff;
     display: inline-flex;
     align-items: center;
@@ -634,7 +634,7 @@ textarea.fi-textarea:focus {
     appearance: none;
     border: 0;
     border-radius: 999px;
-    background: #2e5e48;
+    background: #1c5a58;
     color: #ffffff;
     font-family: inherit;
     font-size: 0.85rem;
@@ -676,7 +676,7 @@ textarea.fi-textarea:focus {
 }
 
 .qaari-recorder__saved {
-    color: #2e5e48;
+    color: #1c5a58;
     font-size: 0.8rem;
     font-weight: 600;
 }

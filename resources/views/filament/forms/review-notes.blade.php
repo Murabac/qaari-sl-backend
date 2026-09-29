@@ -2,7 +2,7 @@
     @forelse ($notes as $note)
         <div class="rounded-xl border border-[rgba(27,58,46,0.12)] bg-[#f7f4ee] p-3">
             <div class="mb-2 flex flex-wrap items-center justify-between gap-2 text-sm">
-                <span class="font-semibold text-[#1b3a2e]">{{ $note->user?->name ?? 'Reviewer' }}</span>
+                <span class="font-semibold text-[#0c403e]">{{ $note->user?->name ?? 'Reviewer' }}</span>
                 <span class="text-[#6b6252]">{{ $note->created_at?->diffForHumans() }}</span>
             </div>
             @if (filled($note->caption))
