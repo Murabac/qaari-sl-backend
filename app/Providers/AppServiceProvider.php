@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 use App\Livewire\GenerateSignedUploadUrl;
+use App\Models\Moment;
 use App\Models\Recitation;
 use App\Models\Reciter;
 use App\Models\User;
 use App\Observers\RecitationObserver;
+use App\Policies\MomentPolicy;
 use App\Policies\RecitationPolicy;
 use App\Policies\ReciterPolicy;
 use App\Policies\UserPolicy;
@@ -39,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::policy(Reciter::class, ReciterPolicy::class);
         Gate::policy(Recitation::class, RecitationPolicy::class);
+        Gate::policy(Moment::class, MomentPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
 
         Recitation::observe(RecitationObserver::class);

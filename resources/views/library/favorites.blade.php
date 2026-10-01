@@ -34,9 +34,12 @@
 @section('title', __('site.favorites').' · '.__('site.footer_brand'))
 
 @section('content')
-    <section class="bg-qaari-bg px-4 pb-16 pt-28 sm:px-6">
+    <section class="bg-qaari-bg px-4 pb-16 pt-6 md:pt-28 sm:px-6">
         <div class="mx-auto max-w-3xl">
-            <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <header class="qaari-forest-header -mx-4 mb-6 sm:-mx-6 md:hidden">
+                <h1 class="qaari-forest-header__title">{{ __('site.favorites') }}</h1>
+            </header>
+            <div class="mb-8 hidden flex-wrap items-end justify-between gap-4 md:flex">
                 <div>
                     <p class="text-sm font-semibold text-qaari-accent">{{ __('site.library') }}</p>
                     <h1 class="font-display text-3xl font-bold text-qaari-primary">{{ __('site.favorites') }}</h1>

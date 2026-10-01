@@ -106,4 +106,7 @@ return [
     'share' => 'Share',
     'link_copied' => 'Link copied',
     'share_listen_desc' => 'Listen to :surah recited by :reciter on Xulka Quraa\'da.',
+    'settings' => 'Settings',
+    'account' => 'Account',
+    'about' => 'About',
 ];

@@ -21,6 +21,12 @@ class HomeController extends Controller
             ->limit(6)
             ->get();
 
+        $allReciters = Reciter::query()
+            ->withApprovedRecitations()
+            ->withCount('approvedRecitations')
+            ->orderBy('name_english')
+            ->get();
+
         $stats = [
             'reciters' => Reciter::query()->withApprovedRecitations()->count(),
             'recitations' => Recitation::query()->approved()->count(),
@@ -61,6 +67,7 @@ class HomeController extends Controller
 
         return view('home', [
             'featured' => $featured,
+            'allReciters' => $allReciters,
             'stats' => $stats,
             'listenNow' => $listenNow,
             'showPartners' => $showPartners,

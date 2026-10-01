@@ -106,4 +106,7 @@ return [
     'share' => 'مشاركة',
     'link_copied' => 'تم نسخ الرابط',
     'share_listen_desc' => 'استمع إلى :surah بصوت :reciter على Xulka Quraa\'da.',
+    'settings' => 'الإعدادات',
+    'account' => 'الحساب',
+    'about' => 'حول',
 ];

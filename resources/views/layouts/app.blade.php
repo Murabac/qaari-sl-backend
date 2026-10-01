@@ -18,17 +18,20 @@
     <link rel="apple-touch-icon" href="{{ asset('images/apple-touch-icon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Nunito:wght@600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body
-    class="site-main flex min-h-screen flex-col"
+    class="site-main flex min-h-screen flex-col has-mobile-tabs"
     x-data="{ toast: '' }"
     x-on:qaari-toast.window="toast = '{{ __('site.link_copied') }}'; setTimeout(() => toast = '', 2200)"
-    x-bind:class="{ 'has-player': $store.player.open }"
+    x-bind:class="{
+        'has-player': $store.player.open,
+        'has-now-playing': $store.player.open && $store.player.expanded,
+    }"
 >
     <header
-        class="site-header {{ $solidHeader ? 'is-solid' : 'is-transparent' }}"
+        class="site-header site-header--marketing hidden md:block {{ $solidHeader ? 'is-solid' : 'is-transparent' }}"
         x-data="{ scrolled: false, menu: false }"
         x-init="
             const onScroll = () => { scrolled = window.scrollY > 24 };
@@ -176,7 +179,7 @@
         @yield('content')
     </main>
 
-    <footer class="mt-auto border-t border-qaari-border bg-qaari-primary text-qaari-primary-fg">
+    <footer class="site-footer--marketing mt-auto hidden border-t border-qaari-border bg-qaari-primary text-qaari-primary-fg md:block">
         <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div class="flex items-center gap-3">
                 <img src="{{ asset('images/logo-mark-light.png') }}" alt="" class="h-12 w-12 shrink-0" width="48" height="48" style="width:3rem;height:3rem">
@@ -198,6 +201,8 @@
     <div id="qaari-web-player-root" data-turbo-permanent>
         @include('components.audio-player')
     </div>
+
+    @include('partials.mobile-tab-bar')
 
     <style>[x-cloak]{display:none!important}</style>
 </body>

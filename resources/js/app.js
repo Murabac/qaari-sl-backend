@@ -50,6 +50,7 @@ function bindAudioEvents(store, audio) {
 
 Alpine.store('player', {
     open: false,
+    expanded: false,
     playing: false,
     current: 0,
     duration: 0,
@@ -63,6 +64,17 @@ Alpine.store('player', {
         this._audio = getSharedAudio();
         bindAudioEvents(this, this._audio);
         this.restore();
+    },
+
+    expand() {
+        if (! this.open || ! this.track) {
+            return;
+        }
+        this.expanded = true;
+    },
+
+    collapse() {
+        this.expanded = false;
     },
 
     setQueue(queue = [], activeId = null) {
@@ -103,6 +115,10 @@ Alpine.store('player', {
             ayahStarts: Array.isArray(track.ayahStarts) ? track.ayahStarts : [],
         };
         this.open = true;
+        // On phone-sized viewports, open the immersive now-playing sheet like the app.
+        if (typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches) {
+            this.expanded = true;
+        }
 
         if (!sameId || currentBase !== nextBase || !this._audio.src) {
             this._audio.src = track.src;
@@ -201,6 +217,7 @@ Alpine.store('player', {
     close() {
         this._audio.pause();
         this.open = false;
+        this.expanded = false;
         this.persist();
     },
 

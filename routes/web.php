@@ -33,6 +33,7 @@ Route::get('/_last-error/{token}', function (string $token) {
 })->name('last-error');
 
 Route::get('/', HomeController::class)->name('home');
+Route::view('/settings', 'settings')->name('settings');
 Route::get('/reciters', [ReciterController::class, 'index'])->name('reciters.index');
 Route::get('/reciters/{reciter}', [ReciterController::class, 'show'])->name('reciters.show');
 Route::get('/story', StoryController::class)->name('story');

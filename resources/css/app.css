@@ -8,6 +8,7 @@
 @theme {
     --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
     --font-display: 'Playfair Display', Georgia, serif;
+    --font-app: 'Nunito', 'DM Sans', ui-sans-serif, system-ui, sans-serif;
     --font-arabic: 'Amiri', 'Times New Roman', serif;
     --color-qaari-bg: #f7f4ee;
     --color-qaari-fg: #1a2416;
@@ -79,6 +80,93 @@
     padding-bottom: 6.5rem;
 }
 
+/* ========== Mobile app shell (Flutter parity under lg) ========== */
+@media (max-width: 767px) {
+    body.site-main {
+        font-family: var(--font-app);
+        padding-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    body.site-main.has-player {
+        padding-bottom: calc(4.25rem + 4.75rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    body.site-main.has-now-playing {
+        padding-bottom: 0;
+        overflow: hidden;
+    }
+
+    .qaari-web-player {
+        bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px));
+    }
+}
+
+.qaari-mobile-tabs {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 55;
+    background: #fff;
+    border-top: 1px solid #e8e4d8;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (min-width: 768px) {
+    .qaari-mobile-tabs {
+        display: none !important;
+    }
+}
+
+.qaari-mobile-tabs__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.65rem 0.25rem 0.8rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: #6b7b72;
+    text-decoration: none;
+}
+
+.qaari-mobile-tabs__item.is-active {
+    color: #0c403e;
+    font-weight: 800;
+}
+
+.qaari-mobile-tabs__icon {
+    width: 1.35rem;
+    height: 1.35rem;
+}
+
+.qaari-forest-header {
+    background: #0c403e;
+    color: #f7f4ee;
+    padding: 1rem 1rem 1.15rem;
+}
+
+.qaari-forest-header--home {
+    padding-bottom: 1.25rem;
+}
+
+.qaari-forest-header__title {
+    margin: 0;
+    font-family: var(--font-app);
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+.qaari-app-page {
+    min-height: 100%;
+}
+
+@media (min-width: 768px) {
+    .qaari-app-page .qaari-forest-header {
+        padding-top: 7rem;
+    }
+}
+
 /* ========== Sticky player ========== */
 .qaari-web-player {
     @apply fixed inset-x-0 bottom-0 z-50;
@@ -127,6 +215,183 @@
 
 .qaari-web-player__time {
     @apply hidden shrink-0 font-mono text-[0.7rem] text-white/35 sm:block;
+}
+
+/* ========== Now Playing sheet ========== */
+.qaari-now-playing {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    color: #f7f4ee;
+}
+
+.qaari-now-playing__bg {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at top, rgba(28, 90, 88, 0.55), transparent 55%),
+        #062423;
+}
+
+.qaari-now-playing__inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 0.75rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+.qaari-now-playing__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: env(safe-area-inset-top, 0px);
+}
+
+.qaari-now-playing__eyebrow {
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #c9a24b;
+}
+
+.qaari-now-playing__icon-btn {
+    display: inline-flex;
+    height: 2.5rem;
+    width: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    color: #f7f4ee;
+}
+
+.qaari-now-playing__art {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 0;
+}
+
+.qaari-now-playing__logo {
+    width: min(42vw, 11rem);
+    height: min(42vw, 11rem);
+    border-radius: 999px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.qaari-now-playing__logo.is-spinning {
+    animation: qaari-spin 12s linear infinite;
+}
+
+.qaari-now-playing__meta {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.qaari-now-playing__title {
+    margin: 0;
+    font-family: var(--font-app);
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+.qaari-now-playing__subtitle {
+    margin: 0.35rem 0 0;
+    color: rgba(201, 162, 75, 0.9);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.qaari-now-playing__actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.qaari-now-playing__chip {
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 0.45rem 0.9rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #f7f4ee;
+    text-decoration: none;
+    background: transparent;
+}
+
+.qaari-now-playing__scrub {
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.qaari-now-playing__scrub-track {
+    position: relative;
+    height: 0.35rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.qaari-now-playing__scrub-fill {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    background: #c9a24b;
+}
+
+.qaari-now-playing__times {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.45rem;
+    font-family: ui-monospace, monospace;
+    font-size: 0.7rem;
+    color: rgba(247, 244, 238, 0.45);
+}
+
+.qaari-now-playing__controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+}
+
+.qaari-now-playing__ctrl {
+    min-width: 2.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 0.55rem 0.65rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: rgba(247, 244, 238, 0.85);
+    background: transparent;
+}
+
+.qaari-now-playing__ctrl:disabled {
+    opacity: 0.3;
+}
+
+.qaari-now-playing__play {
+    display: inline-flex;
+    height: 4rem;
+    width: 4rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: #1c5a58;
+    color: #fff;
+}
+
+@keyframes qaari-spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes qaari-fade-up {

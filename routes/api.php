@@ -3,12 +3,14 @@
 use App\Http\Controllers\Api\Staff\AuthController as StaffAuthController;
 use App\Http\Controllers\Api\Staff\AyahSyncController as StaffAyahSyncController;
 use App\Http\Controllers\Api\Staff\DashboardController as StaffDashboardController;
+use App\Http\Controllers\Api\Staff\MomentController as StaffMomentController;
 use App\Http\Controllers\Api\Staff\RecitationController as StaffRecitationController;
 use App\Http\Controllers\Api\Staff\ReciterController as StaffReciterController;
 use App\Http\Controllers\Api\Staff\ReviewController as StaffReviewController;
 use App\Http\Controllers\Api\Staff\SurahController as StaffSurahController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\FavoriteController;
+use App\Http\Controllers\Api\V1\MomentController;
 use App\Http\Controllers\Api\V1\PlaylistController;
 use App\Http\Controllers\Api\V1\RecitationController;
 use App\Http\Controllers\Api\V1\ReciterController;
@@ -48,6 +50,14 @@ Route::prefix('staff')->group(function (): void {
         Route::get('reviews', [StaffReviewController::class, 'index']);
         Route::post('recitations/{recitation}/approve', [StaffReviewController::class, 'approve']);
         Route::post('recitations/{recitation}/reject', [StaffReviewController::class, 'reject']);
+
+        Route::get('moments', [StaffMomentController::class, 'index']);
+        Route::post('moments', [StaffMomentController::class, 'store']);
+        Route::get('moments/{moment}', [StaffMomentController::class, 'show']);
+        Route::post('moments/{moment}/submit', [StaffMomentController::class, 'submit']);
+        Route::post('moments/{moment}/approve', [StaffMomentController::class, 'approve']);
+        Route::post('moments/{moment}/reject', [StaffMomentController::class, 'reject']);
+        Route::delete('moments/{moment}', [StaffMomentController::class, 'destroy']);
     });
 });
 
@@ -61,6 +71,9 @@ Route::prefix('v1')->group(function (): void {
     Route::get('recitations', [RecitationController::class, 'index']);
     Route::get('recitations/{recitation}/follow-along', [RecitationController::class, 'followAlong']);
     Route::get('recitations/{recitation}', [RecitationController::class, 'show']);
+
+    Route::get('moments', [MomentController::class, 'index']);
+    Route::get('moments/{moment}', [MomentController::class, 'show']);
 
     Route::get('search', SearchController::class);
     Route::get('story', StoryController::class);
@@ -76,6 +89,9 @@ Route::prefix('v1')->group(function (): void {
         Route::get('favorites', [FavoriteController::class, 'index']);
         Route::post('favorites', [FavoriteController::class, 'store']);
         Route::delete('favorites/{recitation}', [FavoriteController::class, 'destroy']);
+
+        Route::post('moments/{moment}/like', [MomentController::class, 'like']);
+        Route::delete('moments/{moment}/like', [MomentController::class, 'unlike']);
 
         Route::get('playlists', [PlaylistController::class, 'index']);
         Route::post('playlists', [PlaylistController::class, 'store']);

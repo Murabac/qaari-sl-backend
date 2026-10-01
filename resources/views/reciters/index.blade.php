@@ -8,10 +8,10 @@
 @section('title', __('site.all_reciters').' · '.__('site.footer_brand'))
 
 @section('content')
-    <section class="bg-qaari-primary qaari-pattern-gold pt-28 pb-14 text-qaari-primary-fg">
+    <section class="bg-qaari-primary qaari-pattern-gold pb-14 pt-10 text-qaari-primary-fg md:pt-28">
         <div class="mx-auto max-w-7xl px-4 sm:px-6">
-            <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-qaari-accent">{{ __('site.footer_brand') }}</p>
-            <h1 class="font-display text-4xl font-bold sm:text-5xl">{{ __('site.all_reciters') }}</h1>
+            <p class="mb-3 hidden text-[11px] font-semibold uppercase tracking-[0.22em] text-qaari-accent md:block">{{ __('site.footer_brand') }}</p>
+            <h1 class="font-display text-3xl font-bold sm:text-5xl md:text-5xl">{{ __('site.all_reciters') }}</h1>
         </div>
     </section>
 

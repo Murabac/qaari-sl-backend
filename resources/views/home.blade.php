@@ -8,6 +8,111 @@
 @section('title', __('site.footer_brand'))
 
 @section('content')
+    {{-- Mobile app-shell home (mirrors Flutter HomeScreen) --}}
+    <section
+        class="qaari-app-home md:hidden"
+        x-data="{
+            q: '',
+            matches(name, region) {
+                const needle = this.q.trim().toLowerCase();
+                if (! needle) return true;
+                return String(name || '').toLowerCase().includes(needle)
+                    || String(region || '').toLowerCase().includes(needle);
+            }
+        }"
+    >
+        <header class="qaari-forest-header qaari-forest-header--home">
+            <div class="flex items-center gap-3">
+                <img src="{{ asset('images/logo-mark-light.png') }}" alt="" class="h-11 w-11 shrink-0" width="44" height="44">
+                <div class="min-w-0">
+                    <p class="truncate text-sm font-extrabold text-qaari-primary-fg">{{ __('site.footer_brand') }}</p>
+                    <p class="truncate text-xs text-qaari-accent/90">{{ __('site.browse') }}</p>
+                </div>
+            </div>
+            <label class="mt-4 block">
+                <span class="sr-only">{{ __('site.search') }}</span>
+                <input
+                    type="search"
+                    x-model.debounce.150ms="q"
+                    placeholder="{{ __('site.search_placeholder') }}"
+                    class="w-full rounded-2xl border-0 bg-[#ede9df] px-4 py-3 text-sm font-semibold text-qaari-primary outline-none ring-0 placeholder:text-[#6B7B72]"
+                    dir="{{ LocaleText::isRtl() ? 'rtl' : 'ltr' }}"
+                >
+            </label>
+        </header>
+
+        <div class="bg-qaari-bg px-4 pb-6 pt-5">
+            @if ($featured->isNotEmpty())
+                <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-qaari-accent">{{ __('site.featured') }}</p>
+                <div class="mb-6 flex gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    @foreach ($featured as $reciter)
+                        @php $photo = MediaUrl::temporary('r2', $reciter->photo_url); @endphp
+                        <a
+                            href="{{ route('reciters.show', $reciter) }}"
+                            class="w-40 shrink-0 overflow-hidden rounded-2xl bg-white shadow-[0_6px_24px_rgba(12,64,62,0.18)] ring-1 ring-qaari-border"
+                            x-show="matches(@js(LocaleText::reciterName($reciter)), @js($reciter->region))"
+                        >
+                            <div class="aspect-[4/3] bg-qaari-primary">
+                                @if ($photo)
+                                    <img src="{{ $photo }}" alt="" class="h-full w-full object-cover">
+                                @else
+                                    <div class="flex h-full items-center justify-center">
+                                        <img src="{{ asset('images/logo-mark.png') }}" alt="" class="h-12 w-12 opacity-70">
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="p-3">
+                                <p class="truncate text-sm font-extrabold text-qaari-primary">{{ LocaleText::reciterName($reciter) }}</p>
+                                <p class="truncate text-[11px] font-semibold text-[#6B7B72]">
+                                    {{ __('site.surahs_available', ['count' => $reciter->approved_recitations_count]) }}
+                                </p>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+
+            <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-qaari-accent">{{ __('site.all_reciters') }}</p>
+            @if (($allReciters ?? $featured)->isEmpty())
+                <p class="text-sm text-qaari-muted">{{ __('site.no_reciters') }}</p>
+            @else
+                <ul class="space-y-2">
+                    @foreach (($allReciters ?? $featured) as $reciter)
+                        @php $photo = MediaUrl::temporary('r2', $reciter->photo_url); @endphp
+                        <li x-show="matches(@js(LocaleText::reciterName($reciter)), @js($reciter->region))">
+                            <a
+                                href="{{ route('reciters.show', $reciter) }}"
+                                class="flex items-center gap-3 rounded-2xl bg-white px-3 py-2.5 shadow-[0_2px_14px_rgba(12,64,62,0.07)] ring-1 ring-qaari-border"
+                            >
+                                <div class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-qaari-primary">
+                                    @if ($photo)
+                                        <img src="{{ $photo }}" alt="" class="h-full w-full object-cover">
+                                    @else
+                                        <div class="flex h-full items-center justify-center">
+                                            <img src="{{ asset('images/logo-mark-light.png') }}" alt="" class="h-7 w-7">
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="truncate text-sm font-extrabold text-qaari-primary">{{ LocaleText::reciterName($reciter) }}</p>
+                                    <p class="truncate text-xs font-semibold text-[#6B7B72]">
+                                        @if ($reciter->region)
+                                            {{ $reciter->region }} ·
+                                        @endif
+                                        {{ __('site.surahs_available', ['count' => $reciter->approved_recitations_count]) }}
+                                    </p>
+                                </div>
+                                <svg class="h-5 w-5 shrink-0 text-qaari-accent {{ LocaleText::isRtl() ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </div>
+    </section>
+
+    {{-- Desktop / large marketing home --}}
+    <div class="hidden md:block">
     {{-- Hero --}}
     <section
         class="relative flex h-[100svh] min-h-[100dvh] items-center justify-center overflow-hidden bg-qaari-deep"
@@ -179,4 +284,5 @@
             </div>
         </section>
     @endif
+    </div>
 @endsection
