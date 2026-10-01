@@ -111,10 +111,14 @@ class AyahSyncController extends Controller
     {
         $this->authorize('syncAyahs', $recitation);
 
-        $overwriteManual = $request->boolean('overwrite_manual');
+        if ($recitation->sync_method === 'manual') {
+            return response()->json([
+                'message' => 'This recitation has manual ayah marks. Automatic matching is permanently disabled — keep editing timings by hand.',
+            ], 422);
+        }
 
         try {
-            $this->sync->sync($recitation, overwriteManual: $overwriteManual);
+            $this->sync->sync($recitation, overwriteManual: false);
         } catch (Throwable $e) {
             return response()->json([
                 'message' => $e->getMessage(),

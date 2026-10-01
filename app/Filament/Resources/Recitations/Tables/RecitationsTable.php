@@ -11,8 +11,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Livewire\Component;
 
 class RecitationsTable
 {
@@ -72,16 +70,7 @@ class RecitationsTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->emptyStateHeading('Choose a reciter')
-            ->modifyQueryUsing(function (Builder $query, Component $livewire): Builder {
-                $reciterId = $livewire->getTableFilterState('reciter_id')['value'] ?? null;
-
-                if (blank($reciterId)) {
-                    return $query->whereRaw('0 = 1');
-                }
-
-                return $query;
-            })
+            ->emptyStateHeading('No recitations')
             ->defaultSort('id', 'desc')
             ->paginated([10, 25, 50])
             ->defaultPaginationPageOption(25)

@@ -6,6 +6,7 @@ use App\Enums\SyncStatus;
 use App\Models\Ayah;
 use App\Models\Recitation;
 use App\Models\RecitationAyahTiming;
+use App\Support\AyahSyncProgress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
@@ -21,7 +22,7 @@ class AyahTimingSyncService
 
         if ($recitation->sync_method === 'manual' && ! $overwriteManual) {
             throw new RuntimeException(
-                'This recitation has manual timings. Auto-sync will not overwrite them. Use “Replace manual with auto” in admin if you really want to start over.'
+                'This recitation has manual timings. Automatic matching is permanently disabled for it.'
             );
         }
 
@@ -33,6 +34,11 @@ class AyahTimingSyncService
                 'sync_method' => null,
                 'manual_sync_ayah' => null,
             ]);
+            AyahSyncProgress::put($recitation->id, [
+                'label' => 'No audio file uploaded.',
+                'percent' => 0,
+                'status' => 'failed',
+            ]);
 
             return $recitation->fresh();
         }
@@ -40,6 +46,11 @@ class AyahTimingSyncService
         $recitation->update([
             'sync_status' => SyncStatus::Syncing,
             'sync_error' => null,
+        ]);
+        AyahSyncProgress::put($recitation->id, [
+            'label' => 'Starting automatic matching…',
+            'percent' => 10,
+            'status' => 'syncing',
         ]);
 
         $tempAudio = null;
@@ -51,6 +62,12 @@ class AyahTimingSyncService
             if ($verseCount < 1) {
                 throw new RuntimeException('Surah verse count is missing.');
             }
+
+            AyahSyncProgress::put($recitation->id, [
+                'label' => 'Preparing ayah text…',
+                'percent' => 20,
+                'status' => 'syncing',
+            ]);
 
             $lengths = Ayah::query()
                 ->where('surah_id', $recitation->surah_id)
@@ -64,9 +81,26 @@ class AyahTimingSyncService
                 $lengths = array_fill(0, $verseCount, 1);
             }
 
+            AyahSyncProgress::put($recitation->id, [
+                'label' => 'Downloading / preparing audio…',
+                'percent' => 35,
+                'status' => 'syncing',
+            ]);
             $tempAudio = $this->materializeAudio($recitation->audio_url);
             $surahNumber = (int) ($recitation->surah?->number ?? 0);
+
+            AyahSyncProgress::put($recitation->id, [
+                'label' => 'Matching ayahs to the recording (this can take a few minutes)…',
+                'percent' => 55,
+                'status' => 'syncing',
+            ]);
             $payload = $this->runAligner($tempAudio, $verseCount, $lengths, $surahNumber);
+
+            AyahSyncProgress::put($recitation->id, [
+                'label' => 'Saving ayah timings…',
+                'percent' => 85,
+                'status' => 'syncing',
+            ]);
 
             DB::transaction(function () use ($recitation, $payload, $verseCount): void {
                 RecitationAyahTiming::query()
@@ -110,10 +144,17 @@ class AyahTimingSyncService
                 ]);
             });
 
+            AyahSyncProgress::put($recitation->id, [
+                'label' => 'Automatic matching finished.',
+                'percent' => 100,
+                'status' => 'synced',
+            ]);
+
             return $recitation->fresh(['ayahTimings', 'surah']);
         } catch (Throwable $e) {
             // Keep existing manual timings intact if we refused / failed before rewrite.
             if ($recitation->fresh()->sync_method === 'manual' && ! $overwriteManual) {
+                AyahSyncProgress::clear($recitation->id);
                 throw $e;
             }
 
@@ -123,6 +164,11 @@ class AyahTimingSyncService
                 'synced_at' => null,
                 'sync_method' => null,
                 'manual_sync_ayah' => null,
+            ]);
+            AyahSyncProgress::put($recitation->id, [
+                'label' => 'Matching failed: '.Str::limit($e->getMessage(), 160),
+                'percent' => 100,
+                'status' => 'failed',
             ]);
 
             throw $e;

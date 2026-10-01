@@ -4,12 +4,13 @@ namespace App\Filament\Resources\Recitations\Pages;
 
 use App\Enums\RecitationStatus;
 use App\Enums\SyncStatus;
+use App\Filament\Concerns\InteractsWithAyahSyncPanel;
 use App\Filament\Concerns\SkipsRenderAfterSuccessfulSave;
 use App\Filament\Resources\Recitations\RecitationResource;
 use App\Jobs\SyncRecitationAyahTimingsJob;
-use App\Livewire\RecitationAyahSyncPanel;
 use App\Models\Recitation;
 use App\Support\AudioMetadata;
+use App\Support\AyahSyncProgress;
 use App\Support\MediaUrl;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -18,13 +19,15 @@ use Filament\Resources\Pages\EditRecord;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\EmbeddedSchema;
 use Filament\Schemas\Components\Form;
-use Filament\Schemas\Components\Livewire as LivewireSchemaComponent;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\View as SchemaView;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class EditRecitation extends EditRecord
 {
+    use InteractsWithAyahSyncPanel;
     use SkipsRenderAfterSuccessfulSave;
 
     protected static string $resource = RecitationResource::class;
@@ -34,22 +37,28 @@ class EditRecitation extends EditRecord
         return $schema
             ->components([
                 $this->getFormContentComponent(),
-                // Nested Livewire keeps ~6k ayah rows out of the edit-page snapshot.
-                LivewireSchemaComponent::make(RecitationAyahSyncPanel::class)
-                    ->lazy()
-                    ->key(fn (): string => 'ayah-sync-'.$this->getRecord()->getKey()),
                 $this->getRelationManagersContentComponent(),
             ]);
     }
 
     public function getFormContentComponent(): Component
     {
-        return Form::make([EmbeddedSchema::make('form')])
-            ->id('form')
-            ->livewireSubmitHandler('save')
-            ->footer([
-                $this->getFormActionsContentComponent(),
-            ]);
+        // Sync panel is a View on this page (not nested Livewire) so wire:click
+        // / wire:poll hit EditRecitation. Keep it outside <form> remorphs.
+        return Group::make([
+            Form::make([EmbeddedSchema::make('form')])
+                ->id('form')
+                ->livewireSubmitHandler('save'),
+            SchemaView::make('filament.forms.ayah-sync-panel')
+                ->viewData(fn (): array => $this->ayahSyncPanelViewData())
+                ->key(fn (): string => 'ayah-sync-panel-'.$this->getRecord()->getKey()),
+            $this->getFormActionsContentComponent(),
+        ]);
+    }
+
+    protected function redirectToEdit(Recitation $record): void
+    {
+        $this->redirect(RecitationResource::getUrl('edit', ['record' => $record]));
     }
 
     protected function getHeaderActions(): array
@@ -71,49 +80,34 @@ class EditRecitation extends EditRecord
                 ->visible(fn (): bool => filled($record->audio_url) && $record->sync_method !== 'manual')
                 ->requiresConfirmation()
                 ->modalHeading('Match text automatically?')
-                ->modalDescription('We’ll listen to the recording and try to mark when each ayah begins. You can fine-tune anything afterwards.')
+                ->modalDescription('We’ll listen to the recording and try to mark when each ayah begins. You can fine-tune anything afterwards. Once you save manual marks, automatic matching stays off for this recitation.')
                 ->modalSubmitActionLabel('Match automatically')
                 ->action(function () use ($record): void {
+                    if ($record->fresh()?->sync_method === 'manual') {
+                        Notification::make()
+                            ->title('Auto sync disabled')
+                            ->body('This recitation has manual ayah marks. Automatic matching stays off.')
+                            ->warning()
+                            ->send();
+
+                        return;
+                    }
+
                     $record->update([
-                        'sync_status' => SyncStatus::Pending,
+                        'sync_status' => SyncStatus::Syncing,
                         'sync_error' => null,
                     ]);
 
+                    AyahSyncProgress::queued($record->id);
                     SyncRecitationAyahTimingsJob::dispatch($record->id);
 
                     Notification::make()
                         ->title('Matching started in the background')
-                        ->body('Automatic matching can take a few minutes on the server. Refresh this page later to see the result.')
+                        ->body('Watch the progress bar on the ayah sync panel below — it updates while the job runs.')
                         ->success()
                         ->send();
-                }),
-            Action::make('replaceManualWithAutoSync')
-                ->label('Start over with automatic matching')
-                ->icon('heroicon-o-arrow-path')
-                ->color('danger')
-                ->visible(fn (): bool => filled($record->audio_url) && $record->sync_method === 'manual')
-                ->requiresConfirmation()
-                ->modalHeading('Start over?')
-                ->modalDescription('This clears the ayah marks you set by hand and queues automatic matching instead. Only do this if you’re sure.')
-                ->modalSubmitActionLabel('Yes, start over')
-                ->action(function () use ($record): void {
-                    $record->forceFill([
-                        'sync_status' => SyncStatus::Pending,
-                        'synced_at' => null,
-                        'sync_error' => null,
-                        'sync_method' => null,
-                        'manual_sync_ayah' => null,
-                    ])->save();
 
-                    $record->ayahTimings()->delete();
-
-                    SyncRecitationAyahTimingsJob::dispatch($record->id);
-
-                    Notification::make()
-                        ->title('Automatic matching queued')
-                        ->body('Your hand-marked ayahs were cleared. Refresh in a few minutes for the new result.')
-                        ->success()
-                        ->send();
+                    $this->redirectToEdit($record);
                 }),
             Action::make('queueSync')
                 ->label('Match in the background')
@@ -123,18 +117,31 @@ class EditRecitation extends EditRecord
                     && $record->sync_status !== SyncStatus::Syncing
                     && $record->sync_method !== 'manual')
                 ->action(function () use ($record): void {
+                    if ($record->fresh()?->sync_method === 'manual') {
+                        Notification::make()
+                            ->title('Auto sync disabled')
+                            ->body('This recitation has manual ayah marks. Automatic matching stays off.')
+                            ->warning()
+                            ->send();
+
+                        return;
+                    }
+
                     $record->update([
-                        'sync_status' => SyncStatus::Pending,
+                        'sync_status' => SyncStatus::Syncing,
                         'sync_error' => null,
                     ]);
 
+                    AyahSyncProgress::queued($record->id);
                     SyncRecitationAyahTimingsJob::dispatch($record->id);
 
                     Notification::make()
                         ->title('Matching started in the background')
-                        ->body('You can keep working. Refresh this page in a few minutes to see the result.')
+                        ->body('Progress updates live on the ayah sync panel — you can keep editing other fields.')
                         ->success()
                         ->send();
+
+                    $this->redirectToEdit($record);
                 }),
             Action::make('submitForReview')
                 ->label('Submit for review')

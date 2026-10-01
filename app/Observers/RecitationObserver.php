@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Enums\SyncStatus;
 use App\Jobs\SyncRecitationAyahTimingsJob;
 use App\Models\Recitation;
+use App\Support\AyahSyncProgress;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -21,11 +22,16 @@ class RecitationObserver
         $surahChanged = $recitation->wasChanged('surah_id');
 
         if ($audioChanged || $surahChanged) {
+            // Once ayahs were marked by hand, keep that lock even if audio/surah changes —
+            // staff must re-mark manually; never re-enable automatic matching.
+            $keepManual = $recitation->getOriginal('sync_method') === 'manual'
+                || $recitation->sync_method === 'manual';
+
             $recitation->forceFill([
                 'sync_status' => SyncStatus::Pending,
                 'synced_at' => null,
                 'sync_error' => null,
-                'sync_method' => null,
+                'sync_method' => $keepManual ? 'manual' : null,
                 'manual_sync_ayah' => null,
             ])->saveQuietly();
 
@@ -41,8 +47,8 @@ class RecitationObserver
             return;
         }
 
-        // Never auto-queue over hand-marked timings unless audio/surah actually changed.
-        if ($recitation->sync_method === 'manual' && ! $audioChanged) {
+        // Manual timings permanently disable background auto-sync for this recitation.
+        if ($recitation->sync_method === 'manual') {
             return;
         }
 
@@ -60,6 +66,13 @@ class RecitationObserver
             $connection = config('queue.default') === 'sync'
                 ? 'database'
                 : (string) config('queue.default');
+
+            $recitation->forceFill([
+                'sync_status' => SyncStatus::Syncing,
+                'sync_error' => null,
+            ])->saveQuietly();
+
+            AyahSyncProgress::queued($recitation->id);
 
             SyncRecitationAyahTimingsJob::dispatch($recitation->id)
                 ->onConnection($connection);
