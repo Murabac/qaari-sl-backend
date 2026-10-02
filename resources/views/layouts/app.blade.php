@@ -179,6 +179,8 @@
         @yield('content')
     </main>
 
+    @include('partials.apk-band')
+
     <footer class="site-footer--marketing mt-auto hidden border-t border-qaari-border bg-qaari-primary text-qaari-primary-fg md:block">
         <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div class="flex items-center gap-3">

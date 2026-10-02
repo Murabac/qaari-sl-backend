@@ -109,4 +109,8 @@ return [
     'settings' => 'Dejinta',
     'account' => 'Akoonka',
     'about' => 'Ku saabsan',
+    'download_apk' => 'Soo dejiso app-ka Android',
+    'download_band_eyebrow' => 'App-ka Android',
+    'download_band_title' => 'Qaado tilaaweynta meel kasta',
+    'download_band_desc' => 'Soo deji Xulka Quraa\'da oo ku dhageyso codka Qur\'aanka Soomaalida taleefankaaga.',
 ];

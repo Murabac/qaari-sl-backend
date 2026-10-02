@@ -32,6 +32,15 @@ Route::get('/_last-error/{token}', function (string $token) {
     ]);
 })->name('last-error');
 
+Route::get('/download/android', function () {
+    $path = public_path('downloads/xulka-quraada.apk');
+    abort_unless(is_file($path), 404);
+
+    return response()->download($path, 'Xulka-Quraada.apk', [
+        'Content-Type' => 'application/vnd.android.package-archive',
+    ]);
+})->name('download.apk');
+
 Route::get('/', HomeController::class)->name('home');
 Route::view('/settings', 'settings')->name('settings');
 Route::get('/reciters', [ReciterController::class, 'index'])->name('reciters.index');

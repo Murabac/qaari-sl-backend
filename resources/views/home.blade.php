@@ -174,6 +174,8 @@
                         {{ __('site.listen_now') }}
                     </button>
                 @endif
+
+                @include('partials.apk-download')
             </div>
         </div>
 

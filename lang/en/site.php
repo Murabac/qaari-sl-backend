@@ -109,4 +109,8 @@ return [
     'settings' => 'Settings',
     'account' => 'Account',
     'about' => 'About',
+    'download_apk' => 'Download Android app',
+    'download_band_eyebrow' => 'The Android app',
+    'download_band_title' => 'Carry the recitations with you',
+    'download_band_desc' => 'Download Xulka Quraa\'da and listen to the Somali Quranic voices on your phone.',
 ];

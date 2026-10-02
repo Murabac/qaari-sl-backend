@@ -109,4 +109,8 @@ return [
     'settings' => 'الإعدادات',
     'account' => 'الحساب',
     'about' => 'حول',
+    'download_apk' => 'تنزيل تطبيق أندرويد',
+    'download_band_eyebrow' => 'تطبيق أندرويد',
+    'download_band_title' => 'خذ التلاوات معك',
+    'download_band_desc' => 'نزّل Xulka Quraa\'da واستمع إلى أصوات القرآن الصومالية من هاتفك.',
 ];
