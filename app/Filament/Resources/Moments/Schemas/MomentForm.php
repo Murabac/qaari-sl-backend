@@ -5,8 +5,10 @@ namespace App\Filament\Resources\Moments\Schemas;
 use App\Enums\MomentStatus;
 use App\Models\Moment;
 use App\Models\User;
+use App\Support\AudioMetadata;
 use App\Support\FilamentR2FileUpload;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -21,6 +23,7 @@ class MomentForm
     public static function configure(Schema $schema): Schema
     {
         $maxKb = (int) config('moments.max_upload_kb', 81920);
+        $maxDuration = (int) config('moments.max_duration_seconds', 60);
 
         return $schema
             ->columns(1)
@@ -34,7 +37,7 @@ class MomentForm
                             ->content(fn (?Moment $record): string => $record?->status?->label() ?? MomentStatus::Draft->label())
                             ->visible(fn (?Moment $record): bool => $record !== null),
                         Select::make('reciter_id')
-                            ->label('Reciter')
+                            ->label('Reciter (optional)')
                             ->relationship(
                                 name: 'reciter',
                                 titleAttribute: 'name_english',
@@ -51,7 +54,7 @@ class MomentForm
                             )
                             ->searchable()
                             ->preload()
-                            ->required(),
+                            ->nullable(),
                         Select::make('surah_id')
                             ->label('Surah (optional)')
                             ->relationship(
@@ -93,14 +96,30 @@ class MomentForm
                                 ->acceptedFileTypes(['video/mp4', 'video/quicktime'])
                                 ->maxSize($maxKb)
                                 ->required()
-                                ->helperText('Prefer 9:16 H.264/AAC MP4, max '.config('moments.max_duration_seconds', 60).' seconds.')
-                                ->afterStateUpdated(function ($state, callable $set): void {
-                                    $file = $state;
-                                    if (is_array($state)) {
-                                        $file = $state[0] ?? null;
+                                ->helperText('Prefer 9:16 H.264/AAC MP4, max '.$maxDuration.' seconds. Duration is detected automatically.')
+                                ->afterStateUpdated(function ($state, callable $set) use ($maxDuration): void {
+                                    if (! ($state instanceof TemporaryUploadedFile)
+                                        && ! (is_array($state) && ($state[0] ?? null) instanceof TemporaryUploadedFile)
+                                    ) {
+                                        return;
                                     }
-                                    if ($file instanceof TemporaryUploadedFile) {
-                                        $set('file_size', $file->getSize());
+
+                                    $meta = AudioMetadata::fromUpload($state, 'r2');
+
+                                    if ($meta['duration'] !== null) {
+                                        $set('duration', min($meta['duration'], $maxDuration));
+                                    }
+
+                                    if ($meta['file_size'] !== null) {
+                                        $set('file_size', $meta['file_size']);
+                                    }
+
+                                    if ($meta['width'] !== null) {
+                                        $set('width', $meta['width']);
+                                    }
+
+                                    if ($meta['height'] !== null) {
+                                        $set('height', $meta['height']);
                                     }
                                 }),
                         ),
@@ -116,16 +135,15 @@ class MomentForm
                             ->label('Duration (seconds)')
                             ->numeric()
                             ->minValue(1)
-                            ->maxValue((int) config('moments.max_duration_seconds', 60))
-                            ->helperText('Enter clip length in seconds (max '.config('moments.max_duration_seconds', 60).').')
+                            ->maxValue($maxDuration)
+                            ->helperText('Detected from the uploaded video (max '.$maxDuration.'s). Edit only if detection fails.')
                             ->required(),
-                        TextInput::make('file_size')
-                            ->numeric()
-                            ->hidden(),
+                        Hidden::make('file_size')->dehydrated(),
                         TextInput::make('width')
                             ->label('Width (px)')
                             ->numeric()
-                            ->nullable(),
+                            ->nullable()
+                            ->helperText('Detected from video when available.'),
                         TextInput::make('height')
                             ->label('Height (px)')
                             ->numeric()

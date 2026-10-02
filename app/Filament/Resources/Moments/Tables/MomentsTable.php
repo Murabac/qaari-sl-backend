@@ -21,7 +21,8 @@ class MomentsTable
                 TextColumn::make('reciter.name_english')
                     ->label('Reciter')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 TextColumn::make('title')
                     ->searchable()
                     ->limit(40)

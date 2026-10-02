@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('moments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('reciter_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('reciter_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('surah_id')->nullable()->constrained()->nullOnDelete();
             $table->unsignedSmallInteger('ayah_number')->nullable();
             $table->string('title')->nullable();

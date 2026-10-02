@@ -6,11 +6,12 @@ use App\Enums\MomentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MomentResource;
 use App\Models\Moment;
-use App\Models\Reciter;
+use App\Support\AudioMetadata;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class MomentController extends Controller
 {
@@ -46,21 +47,31 @@ class MomentController extends Controller
         $maxDuration = (int) config('moments.max_duration_seconds', 60);
 
         $validated = $request->validate([
-            'reciter_id' => ['required', 'integer', 'exists:reciters,id'],
+            'reciter_id' => ['nullable', 'integer', 'exists:reciters,id'],
             'surah_id' => ['nullable', 'integer', 'exists:surahs,id'],
             'ayah_number' => ['nullable', 'integer', 'min:1', 'max:286'],
             'title' => ['nullable', 'string', 'max:120'],
             'caption' => ['nullable', 'string', 'max:1000'],
-            'duration' => ['required', 'integer', 'min:1', 'max:'.$maxDuration],
+            'duration' => ['nullable', 'integer', 'min:1', 'max:'.$maxDuration],
             'width' => ['nullable', 'integer', 'min:1'],
             'height' => ['nullable', 'integer', 'min:1'],
             'video' => ['required', 'file', 'mimetypes:video/mp4,video/quicktime', 'max:'.$maxKb],
             'poster' => ['nullable', 'file', 'image', 'max:5120'],
         ]);
 
-        Reciter::query()->findOrFail($validated['reciter_id']);
+        $videoFile = $request->file('video');
+        $meta = AudioMetadata::fromUpload($videoFile->getPathname(), 'r2');
+        $duration = $validated['duration'] ?? $meta['duration'];
 
-        $videoPath = $request->file('video')->store(
+        if ($duration === null || $duration < 1) {
+            throw ValidationException::withMessages([
+                'video' => 'Could not detect video duration. Re-encode as MP4 or send duration.',
+            ]);
+        }
+
+        $duration = min((int) $duration, $maxDuration);
+
+        $videoPath = $videoFile->store(
             config('moments.video_directory', 'moments/videos'),
             'r2'
         );
@@ -74,17 +85,17 @@ class MomentController extends Controller
         }
 
         $moment = Moment::query()->create([
-            'reciter_id' => $validated['reciter_id'],
+            'reciter_id' => $validated['reciter_id'] ?? null,
             'surah_id' => $validated['surah_id'] ?? null,
             'ayah_number' => $validated['ayah_number'] ?? null,
             'title' => $validated['title'] ?? null,
             'caption' => $validated['caption'] ?? null,
             'video_url' => $videoPath,
             'poster_url' => $posterPath,
-            'duration' => $validated['duration'],
-            'width' => $validated['width'] ?? null,
-            'height' => $validated['height'] ?? null,
-            'file_size' => $request->file('video')->getSize(),
+            'duration' => $duration,
+            'width' => $validated['width'] ?? $meta['width'],
+            'height' => $validated['height'] ?? $meta['height'],
+            'file_size' => $meta['file_size'] ?? $videoFile->getSize(),
             'likes_count' => 0,
             'status' => MomentStatus::Draft,
             'created_by' => $request->user()->id,

@@ -42,9 +42,15 @@ class EditMoment extends EditRecord
             $data['video_url'] = $record->video_url;
         }
 
-        $maxDuration = (int) config('moments.max_duration_seconds', 60);
-        if (isset($data['duration'])) {
-            $data['duration'] = min((int) $data['duration'], $maxDuration);
+        if ($video instanceof TemporaryUploadedFile
+            || (is_string($video) && $video !== '' && $video !== $record->video_url)
+        ) {
+            $data = CreateMoment::fillVideoMetadata($data);
+        } else {
+            $maxDuration = (int) config('moments.max_duration_seconds', 60);
+            if (isset($data['duration'])) {
+                $data['duration'] = min((int) $data['duration'], $maxDuration);
+            }
         }
 
         return $data;

@@ -11,12 +11,14 @@ use Throwable;
 class AudioMetadata
 {
     /**
-     * @return array{duration: int|null, file_size: int|null}
+     * @return array{duration: int|null, file_size: int|null, width: int|null, height: int|null}
      */
     public static function fromUpload(mixed $state, string $disk = 'r2'): array
     {
+        $empty = ['duration' => null, 'file_size' => null, 'width' => null, 'height' => null];
+
         if (blank($state)) {
-            return ['duration' => null, 'file_size' => null];
+            return $empty;
         }
 
         if (is_array($state)) {
@@ -24,7 +26,7 @@ class AudioMetadata
         }
 
         if (blank($state)) {
-            return ['duration' => null, 'file_size' => null];
+            return $empty;
         }
 
         if ($state instanceof TemporaryUploadedFile) {
@@ -32,14 +34,11 @@ class AudioMetadata
         }
 
         if (! is_string($state)) {
-            return ['duration' => null, 'file_size' => null];
+            return $empty;
         }
 
         if (is_file($state)) {
-            return [
-                'duration' => self::durationFromLocalPath($state),
-                'file_size' => filesize($state) ?: null,
-            ];
+            return self::metaFromLocalPath($state);
         }
 
         try {
@@ -47,6 +46,8 @@ class AudioMetadata
                 return [
                     'duration' => self::durationFromRemote($disk, $state),
                     'file_size' => Storage::disk($disk)->size($state) ?: null,
+                    'width' => null,
+                    'height' => null,
                 ];
             }
         } catch (Throwable) {
@@ -56,21 +57,20 @@ class AudioMetadata
         try {
             if (Storage::disk('local')->exists($state)) {
                 $localPath = Storage::disk('local')->path($state);
+                $meta = self::metaFromLocalPath($localPath);
+                $meta['file_size'] = $meta['file_size'] ?? (Storage::disk('local')->size($state) ?: null);
 
-                return [
-                    'duration' => self::durationFromLocalPath($localPath),
-                    'file_size' => Storage::disk('local')->size($state) ?: null,
-                ];
+                return $meta;
             }
         } catch (Throwable) {
             // Fall through.
         }
 
-        return ['duration' => null, 'file_size' => null];
+        return $empty;
     }
 
     /**
-     * @return array{duration: int|null, file_size: int|null}
+     * @return array{duration: int|null, file_size: int|null, width: int|null, height: int|null}
      */
     private static function fromTemporaryUpload(TemporaryUploadedFile $file, string $disk): array
     {
@@ -78,10 +78,10 @@ class AudioMetadata
         $localPath = $file->getRealPath();
 
         if (filled($localPath) && is_file($localPath)) {
-            return [
-                'duration' => self::durationFromLocalPath($localPath),
-                'file_size' => $fileSize,
-            ];
+            $meta = self::metaFromLocalPath($localPath);
+            $meta['file_size'] = $fileSize ?? $meta['file_size'];
+
+            return $meta;
         }
 
         // S3/R2 temporary uploads: prefer ffprobe on a signed URL (no full download).
@@ -94,6 +94,8 @@ class AudioMetadata
                     return [
                         'duration' => self::durationFromRemote($disk, $candidate),
                         'file_size' => $fileSize ?? Storage::disk($disk)->size($candidate) ?: null,
+                        'width' => null,
+                        'height' => null,
                     ];
                 }
             } catch (Throwable) {
@@ -101,7 +103,7 @@ class AudioMetadata
             }
         }
 
-        return ['duration' => null, 'file_size' => $fileSize];
+        return ['duration' => null, 'file_size' => $fileSize, 'width' => null, 'height' => null];
     }
 
     private static function durationFromRemote(string $disk, string $path): ?int
@@ -115,27 +117,98 @@ class AudioMetadata
         return self::durationWithFfprobe($url);
     }
 
-    private static function durationFromLocalPath(string $path): ?int
+    /**
+     * @return array{duration: int|null, file_size: int|null, width: int|null, height: int|null}
+     */
+    private static function metaFromLocalPath(string $path): array
     {
-        $fromProbe = self::durationWithFfprobe($path);
+        $duration = self::durationWithFfprobe($path);
+        $width = null;
+        $height = null;
+        $fileSize = filesize($path) ?: null;
 
-        if ($fromProbe !== null) {
-            return $fromProbe;
+        $dimensions = self::dimensionsWithFfprobe($path);
+        if ($dimensions !== null) {
+            [$width, $height] = $dimensions;
         }
 
         try {
             $analyzer = new getID3;
             $info = $analyzer->analyze($path);
-            $seconds = data_get($info, 'playtime_seconds');
 
-            if (is_numeric($seconds) && $seconds > 0) {
-                return (int) round((float) $seconds);
+            if ($duration === null) {
+                $seconds = data_get($info, 'playtime_seconds');
+                if (is_numeric($seconds) && $seconds > 0) {
+                    $duration = (int) round((float) $seconds);
+                }
+            }
+
+            if ($width === null) {
+                $resolvedWidth = data_get($info, 'video.resolution_x')
+                    ?? data_get($info, 'video.streams.0.resolution_x');
+                if (is_numeric($resolvedWidth) && (int) $resolvedWidth > 0) {
+                    $width = (int) $resolvedWidth;
+                }
+            }
+
+            if ($height === null) {
+                $resolvedHeight = data_get($info, 'video.resolution_y')
+                    ?? data_get($info, 'video.streams.0.resolution_y');
+                if (is_numeric($resolvedHeight) && (int) $resolvedHeight > 0) {
+                    $height = (int) $resolvedHeight;
+                }
             }
         } catch (Throwable) {
+            // Keep whatever ffprobe already found.
+        }
+
+        return [
+            'duration' => $duration,
+            'file_size' => $fileSize,
+            'width' => $width,
+            'height' => $height,
+        ];
+    }
+
+    private static function durationFromLocalPath(string $path): ?int
+    {
+        return self::metaFromLocalPath($path)['duration'];
+    }
+
+    /**
+     * @return array{0: int, 1: int}|null
+     */
+    private static function dimensionsWithFfprobe(string $input): ?array
+    {
+        $ffprobe = self::ffprobeBinary();
+
+        if ($ffprobe === null) {
             return null;
         }
 
-        return null;
+        try {
+            $result = Process::timeout(15)->run([
+                $ffprobe,
+                '-v', 'error',
+                '-select_streams', 'v:0',
+                '-show_entries', 'stream=width,height',
+                '-of', 'csv=s=x:p=0',
+                $input,
+            ]);
+
+            if (! $result->successful()) {
+                return null;
+            }
+
+            $line = trim(explode("\n", trim($result->output()))[0] ?? '');
+            if (! preg_match('/^(\d+)x(\d+)$/', $line, $matches)) {
+                return null;
+            }
+
+            return [(int) $matches[1], (int) $matches[2]];
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     private static function durationWithFfprobe(string $input): ?int

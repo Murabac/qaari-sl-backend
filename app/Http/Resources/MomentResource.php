@@ -41,8 +41,14 @@ class MomentResource extends JsonResource
             'liked' => (bool) ($this->liked ?? false),
             'status' => $this->status?->value,
             'linked_recitation_id' => $linkedRecitationId,
-            'reciter' => new ReciterResource($this->whenLoaded('reciter')),
-            'surah' => new SurahResource($this->whenLoaded('surah')),
+            'reciter' => $this->whenLoaded(
+                'reciter',
+                fn () => $this->reciter ? new ReciterResource($this->reciter) : null,
+            ),
+            'surah' => $this->whenLoaded(
+                'surah',
+                fn () => $this->surah ? new SurahResource($this->surah) : null,
+            ),
             'created_at' => $this->created_at?->toIso8601String(),
         ];
     }
