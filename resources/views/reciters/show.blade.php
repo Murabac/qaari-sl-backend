@@ -149,7 +149,7 @@
 
                                     <a
                                         href="{{ $track['follow_url'] }}"
-                                        class="hidden shrink-0 rounded-full px-2 py-1 text-xs font-semibold text-qaari-primary hover:text-qaari-accent sm:inline"
+                                        class="inline-flex min-h-11 shrink-0 items-center rounded-full px-2 py-1 text-xs font-semibold text-qaari-primary hover:text-qaari-accent"
                                         title="{{ __('site.follow_along') }}"
                                     >{{ __('site.follow_along_short') }}</a>
 

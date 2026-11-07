@@ -49,6 +49,7 @@
                 x-show="$store.player.track?.followUrl"
                 x-cloak
                 x-bind:href="$store.player.track?.followUrl || '#'"
+                x-on:click="$store.player.collapse()"
             >{{ __('site.follow_along') }}</a>
             <button type="button" class="qaari-now-playing__chip" x-on:click="$store.player.share()">
                 {{ __('site.share') }}
@@ -183,10 +184,11 @@
             </div>
 
             <a
-                class="hidden rounded-full border border-white/15 px-2.5 py-1 text-[0.65rem] font-semibold text-qaari-accent transition hover:border-qaari-accent sm:inline"
+                class="inline-flex min-h-9 shrink-0 items-center rounded-full border border-white/15 px-2.5 py-1 text-[0.65rem] font-semibold text-qaari-accent transition hover:border-qaari-accent"
                 x-show="$store.player.track?.followUrl"
                 x-cloak
                 x-bind:href="$store.player.track?.followUrl || '#'"
+                x-on:click="$store.player.collapse()"
             >{{ __('site.follow_along_short') }}</a>
 
             <button

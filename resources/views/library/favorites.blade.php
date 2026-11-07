@@ -89,7 +89,7 @@
                                 <p class="truncate font-semibold text-qaari-primary">{{ $title }}</p>
                                 <p class="truncate text-sm text-qaari-muted">{{ $subtitle }}</p>
                             </div>
-                            <a href="{{ route('follow-along.show', $recitation) }}" class="hidden text-xs font-semibold text-qaari-primary sm:inline hover:text-qaari-accent">
+                            <a href="{{ route('follow-along.show', $recitation) }}" class="inline-flex min-h-11 shrink-0 items-center text-xs font-semibold text-qaari-primary hover:text-qaari-accent">
                                 {{ __('site.follow_along') }}
                             </a>
                             <form method="POST" action="{{ route('library.favorites.destroy', $recitation) }}">

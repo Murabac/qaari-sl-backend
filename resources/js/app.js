@@ -115,8 +115,11 @@ Alpine.store('player', {
             ayahStarts: Array.isArray(track.ayahStarts) ? track.ayahStarts : [],
         };
         this.open = true;
-        // On phone-sized viewports, open the immersive now-playing sheet like the app.
-        if (typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches) {
+        // On a phone, open the now-playing sheet. Leave it closed on Follow Along
+        // so the ayah text stays visible under the mini player.
+        const onFollowPage = typeof window !== 'undefined'
+            && window.location.pathname.includes('/listen/');
+        if (!onFollowPage && typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches) {
             this.expanded = true;
         }
 
@@ -429,6 +432,8 @@ Alpine.data('followAlong', (config) => ({
     _lastScroll: -1,
 
     boot() {
+        this.$store.player.collapse();
+
         if (config.autoPlay?.src) {
             this.$store.player.ensurePlaying(config.autoPlay, config.queue || null);
         }
