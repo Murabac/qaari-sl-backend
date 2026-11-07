@@ -14,6 +14,17 @@ class WebsitePagesTest extends TestCase
     use CreatesCatalogData;
     use RefreshDatabase;
 
+    public function test_phone_moments_page_and_somali_nav_labels(): void
+    {
+        $this->get('/moments')->assertOk()->assertSee('Moments', false);
+
+        $this->get('/locale/so')->assertRedirect();
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Moments', false)
+            ->assertDontSee('Dhaqdho', false);
+    }
+
     public function test_home_and_reciters_pages_render(): void
     {
         $reciter = $this->makeReciter(['name_english' => 'Website Reciter']);

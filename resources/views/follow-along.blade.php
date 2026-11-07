@@ -22,7 +22,7 @@
 
 @section('content')
     <section
-        class="bg-qaari-deep px-4 pb-28 pt-28 text-qaari-primary-fg sm:px-6"
+        class="qaari-follow bg-qaari-deep px-4 pb-28 pt-28 text-qaari-primary-fg sm:px-6"
         x-data="followAlong(@js([
             'ayahs' => $ayahPayload,
             'queue' => $playerQueue,
@@ -104,18 +104,18 @@
             </div>
         </div>
 
-        <div class="mx-auto mt-12 max-w-2xl space-y-6" dir="rtl">
+        <div class="mx-auto mt-8 max-w-2xl space-y-3" dir="rtl">
             @forelse ($ayahs as $index => $ayah)
                 <button
                     type="button"
-                    class="font-arabic scroll-mt-32 block w-full text-center text-2xl leading-[2.2] transition duration-300 sm:text-3xl"
-                    x-bind:class="currentAyah === {{ $index }} ? 'text-qaari-accent scale-[1.02]' : 'text-qaari-primary-fg/55 hover:text-qaari-primary-fg/80'"
+                    class="font-arabic scroll-mt-32 block w-full rounded-2xl border px-4 py-4 text-right text-2xl leading-[1.9] transition duration-300"
+                    x-bind:class="currentAyah === {{ $index }} ? 'border-[#D4AF37] bg-[#0D3B2E] text-[#F3D082]' : 'border-[#E8E4D8] bg-white text-[#0D3B2E]'"
                     x-bind:data-ayah="{{ $index }}"
                     id="ayah-{{ $ayah->number }}"
                     x-on:click="$store.player.seekAyah({{ $index }})"
                 >
+                    <span class="float-left mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#F5F2EA] text-xs font-extrabold text-[#0D3B2E]" dir="ltr">{{ $ayah->number }}</span>
                     <span>{{ $ayah->text_uthmani }}</span>
-                    <span class="ms-2 align-middle text-sm text-qaari-accent/70">﴿{{ $ayah->number }}﴾</span>
                 </button>
             @empty
                 <p class="text-center text-qaari-primary-fg/60" dir="ltr">{{ __('site.ayahs_unavailable') }}</p>

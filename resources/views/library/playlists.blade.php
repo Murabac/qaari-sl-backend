@@ -3,7 +3,7 @@
 @section('title', __('site.playlists').' · '.__('site.footer_brand'))
 
 @section('content')
-    <section class="bg-qaari-bg px-4 pb-16 pt-6 md:pt-28 sm:px-6">
+    <section class="bg-qaari-bg px-4 pb-16 pt-0 md:pt-28 sm:px-6">
         <div class="mx-auto max-w-3xl">
             <header class="qaari-forest-header -mx-4 mb-6 sm:-mx-6 md:hidden">
                 <h1 class="qaari-forest-header__title">{{ __('site.playlists') }}</h1>

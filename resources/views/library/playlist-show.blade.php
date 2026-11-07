@@ -34,14 +34,20 @@
 @section('title', $playlist->name.' · '.__('site.footer_brand'))
 
 @section('content')
-    <section class="bg-qaari-bg px-4 pb-16 pt-28 sm:px-6">
+    <section class="bg-qaari-bg px-4 pb-16 pt-0 md:pt-28 sm:px-6">
         <div class="mx-auto max-w-3xl">
-            <a href="{{ route('library.playlists') }}" class="mb-4 inline-block text-sm font-semibold text-qaari-accent hover:text-qaari-accent-hover">
+            <header class="qaari-forest-header -mx-4 mb-6 sm:-mx-6 md:hidden">
+                <a href="{{ route('library.playlists') }}" class="mb-2 inline-block text-sm font-semibold text-[#F3D082]">
+                    ← {{ LocaleText::nav('Playlists', 'site.playlists') }}
+                </a>
+                <h1 class="qaari-forest-header__title">{{ $playlist->name }}</h1>
+            </header>
+            <a href="{{ route('library.playlists') }}" class="mb-4 hidden text-sm font-semibold text-qaari-accent hover:text-qaari-accent-hover md:inline-block">
                 ← {{ __('site.playlists') }}
             </a>
 
             <div class="mb-8 flex flex-wrap items-start justify-between gap-4">
-                <h1 class="font-display text-3xl font-bold text-qaari-primary">{{ $playlist->name }}</h1>
+                <h1 class="hidden font-display text-3xl font-bold text-qaari-primary md:block">{{ $playlist->name }}</h1>
                 <form method="POST" action="{{ route('library.playlists.destroy', $playlist) }}" onsubmit="return confirm(@js(__('site.confirm_delete_playlist')))">
                     @csrf
                     @method('DELETE')

@@ -1,4 +1,4 @@
-<section class="bg-qaari-bg px-4 py-10 sm:px-6 sm:py-16" aria-labelledby="apk-band-title">
+<section class="hidden bg-qaari-bg px-4 py-10 sm:px-6 sm:py-16 md:block" aria-labelledby="apk-band-title">
     <div class="relative mx-auto max-w-7xl overflow-hidden rounded-3xl bg-qaari-deep text-qaari-primary-fg">
         <div class="qaari-pattern-gold pointer-events-none absolute inset-0" aria-hidden="true"></div>
         <div class="relative flex flex-col gap-8 px-6 py-10 sm:px-12 sm:py-14 lg:flex-row lg:items-center lg:justify-between">

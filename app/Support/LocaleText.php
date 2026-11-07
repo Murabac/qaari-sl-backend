@@ -35,6 +35,41 @@ class LocaleText
     }
 
     /**
+     * Somali screens keep these navigation words in English.
+     */
+    public static function nav(string $english, string $key): string
+    {
+        return self::locale() === 'so' ? $english : __($key);
+    }
+
+    public static function portrait(Reciter $reciter): ?string
+    {
+        $haystack = strtolower(trim(($reciter->name_english ?? '').' '.($reciter->name_somali ?? '')));
+        $file = null;
+
+        if (str_contains($haystack, 'sufi') || str_contains($haystack, 'suufi') || str_contains($haystack, 'cabdirashiid')) {
+            $file = 'sheikh_abdirashid.jpg';
+        } elseif (
+            str_contains($haystack, 'alafasy')
+            || str_contains($haystack, 'mishary')
+            || str_contains($haystack, 'cafaasi')
+            || str_contains($haystack, 'abdilahi')
+            || str_contains($haystack, 'cabdilaahi')
+        ) {
+            $file = 'sheikh_abdilahi.jpg';
+        } elseif (
+            str_contains($haystack, 'hussary')
+            || str_contains($haystack, 'husary')
+            || str_contains($haystack, 'mustafe')
+            || str_contains($haystack, 'mahmoud')
+        ) {
+            $file = 'sheikh_mustafe.jpg';
+        }
+
+        return $file === null ? null : asset('images/reciters/'.$file);
+    }
+
+    /**
      * @param  object{name_english?: ?string, name_somali?: ?string, name_arabic?: ?string, bio_english?: ?string, bio_somali?: ?string, bio_arabic?: ?string}  $model
      */
     private static function pick(object $model, string $field): ?string

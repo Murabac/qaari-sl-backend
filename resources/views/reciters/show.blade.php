@@ -40,14 +40,22 @@
 @endsection
 
 @section('content')
-    <section class="relative overflow-hidden bg-qaari-primary pt-28 pb-16 text-qaari-primary-fg">
+    <section class="qaari-reciter-hero relative overflow-hidden bg-qaari-primary pt-28 pb-16 text-qaari-primary-fg">
         <div class="qaari-pattern-gold absolute inset-0 opacity-80"></div>
         <div class="relative mx-auto flex max-w-7xl flex-col gap-8 px-4 sm:flex-row sm:items-end sm:px-6">
+            @php $portrait = LocaleText::portrait($reciter); @endphp
             <div class="h-40 w-40 shrink-0 overflow-hidden rounded-2xl bg-qaari-deep ring-1 ring-white/10 sm:h-48 sm:w-48">
+                @if ($portrait)
+                    <img src="{{ $portrait }}" alt="" class="h-full w-full object-cover md:hidden">
+                @endif
                 @if ($photoUrl)
-                    <img src="{{ $photoUrl }}" alt="{{ LocaleText::reciterName($reciter) }}" class="h-full w-full object-cover">
-                @else
+                    <img src="{{ $photoUrl }}" alt="{{ LocaleText::reciterName($reciter) }}" class="{{ $portrait ? 'hidden md:block' : '' }} h-full w-full object-cover">
+                @elseif (! $portrait)
                     <div class="flex h-full items-center justify-center">
+                        <img src="{{ asset('images/logo-mark.png') }}" alt="" class="h-16 w-16 opacity-70">
+                    </div>
+                @else
+                    <div class="hidden h-full items-center justify-center md:flex">
                         <img src="{{ asset('images/logo-mark.png') }}" alt="" class="h-16 w-16 opacity-70">
                     </div>
                 @endif

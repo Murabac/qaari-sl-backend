@@ -6,6 +6,7 @@ use App\Http\Controllers\Web\FavoriteController;
 use App\Http\Controllers\Web\FollowAlongController;
 use App\Http\Controllers\Web\HomeController;
 use App\Http\Controllers\Web\LocaleController;
+use App\Http\Controllers\Web\MomentsController;
 use App\Http\Controllers\Web\PlaylistController;
 use App\Http\Controllers\Web\ReciterController;
 use App\Http\Controllers\Web\StoryController;
@@ -52,6 +53,16 @@ Route::get('/account-deletion/done', [AccountDeletionController::class, 'done'])
 Route::delete('/account-deletion', [AccountDeletionController::class, 'destroy'])->name('account-deletion.destroy');
 Route::get('/locale/{locale}', LocaleController::class)->name('locale.switch');
 Route::get('/listen/{recitation}', [FollowAlongController::class, 'show'])->name('follow-along.show');
+Route::get('/moments', [MomentsController::class, 'index'])->name('moments.index');
+
+Route::middleware('auth')->group(function () {
+    Route::post('/moments/{moment}/like', [MomentsController::class, 'like'])->name('moments.like');
+    Route::delete('/moments/{moment}/like', [MomentsController::class, 'unlike'])->name('moments.unlike');
+    Route::post('/moments/{moment}/save', [MomentsController::class, 'save'])->name('moments.save');
+    Route::delete('/moments/{moment}/save', [MomentsController::class, 'unsave'])->name('moments.unsave');
+    Route::post('/moments/{moment}/comments', [MomentsController::class, 'comment'])->name('moments.comment');
+    Route::delete('/moments/{moment}/comments/{comment}', [MomentsController::class, 'destroyComment'])->name('moments.comments.destroy');
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');

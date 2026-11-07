@@ -46,19 +46,15 @@
                 <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-qaari-accent">{{ __('site.featured') }}</p>
                 <div class="mb-6 flex gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     @foreach ($featured as $reciter)
-                        @php $photo = MediaUrl::temporary('r2', $reciter->photo_url); @endphp
+                        @php $photo = LocaleText::portrait($reciter) ?: MediaUrl::temporary('r2', $reciter->photo_url); @endphp
                         <a
                             href="{{ route('reciters.show', $reciter) }}"
-                            class="w-40 shrink-0 overflow-hidden rounded-2xl bg-white shadow-[0_6px_24px_rgba(12,64,62,0.18)] ring-1 ring-qaari-border"
+                            class="w-44 shrink-0 overflow-hidden rounded-3xl bg-white shadow-[0_6px_24px_rgba(8,40,31,0.18)] ring-1 ring-qaari-border"
                             x-show="matches(@js(LocaleText::reciterName($reciter)), @js($reciter->region))"
                         >
-                            <div class="aspect-[4/3] bg-qaari-primary">
+                            <div class="aspect-[3/4] bg-[#08281F]">
                                 @if ($photo)
                                     <img src="{{ $photo }}" alt="" class="h-full w-full object-cover">
-                                @else
-                                    <div class="flex h-full items-center justify-center">
-                                        <img src="{{ asset('images/logo-mark.png') }}" alt="" class="h-12 w-12 opacity-70">
-                                    </div>
                                 @endif
                             </div>
                             <div class="p-3">
@@ -78,19 +74,15 @@
             @else
                 <ul class="space-y-2">
                     @foreach (($allReciters ?? $featured) as $reciter)
-                        @php $photo = MediaUrl::temporary('r2', $reciter->photo_url); @endphp
+                        @php $photo = LocaleText::portrait($reciter) ?: MediaUrl::temporary('r2', $reciter->photo_url); @endphp
                         <li x-show="matches(@js(LocaleText::reciterName($reciter)), @js($reciter->region))">
                             <a
                                 href="{{ route('reciters.show', $reciter) }}"
-                                class="flex items-center gap-3 rounded-2xl bg-white px-3 py-2.5 shadow-[0_2px_14px_rgba(12,64,62,0.07)] ring-1 ring-qaari-border"
+                                class="flex items-center gap-3 rounded-2xl bg-white px-3 py-2.5 shadow-[0_2px_14px_rgba(8,40,31,0.07)] ring-1 ring-qaari-border"
                             >
-                                <div class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-qaari-primary">
+                                <div class="h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-[#08281F]">
                                     @if ($photo)
                                         <img src="{{ $photo }}" alt="" class="h-full w-full object-cover">
-                                    @else
-                                        <div class="flex h-full items-center justify-center">
-                                            <img src="{{ asset('images/logo-mark-light.png') }}" alt="" class="h-7 w-7">
-                                        </div>
                                     @endif
                                 </div>
                                 <div class="min-w-0 flex-1">

@@ -18,7 +18,7 @@
     <link rel="apple-touch-icon" href="{{ asset('images/apple-touch-icon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Nunito:wght@600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Nunito:wght@600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body
@@ -141,12 +141,14 @@
             x-show="menu"
             x-cloak
         >
-            <a href="{{ route('home') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ __('site.home') }}</a>
+            <a href="{{ route('home') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ LocaleText::nav('Home', 'site.home') }}</a>
+            <a href="{{ route('moments.index') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ LocaleText::nav('Moments', 'site.moments') }}</a>
             <a href="{{ route('reciters.index') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ __('site.reciters') }}</a>
             <a href="{{ route('story') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ __('site.story') }}</a>
             @auth
-                <a href="{{ route('library.favorites') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ __('site.favorites') }}</a>
-                <a href="{{ route('library.playlists') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ __('site.playlists') }}</a>
+                <a href="{{ route('library.favorites') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ LocaleText::nav('Favorites', 'site.favorites') }}</a>
+                <a href="{{ route('library.playlists') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ LocaleText::nav('Playlists', 'site.playlists') }}</a>
+                <a href="{{ route('settings') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ LocaleText::nav('Settings', 'site.settings') }}</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="block py-2 text-sm font-semibold text-qaari-primary">{{ __('site.logout') }}</button>
@@ -179,7 +181,9 @@
         @yield('content')
     </main>
 
-    @include('partials.apk-band')
+    @unless ($hideApk ?? false)
+        @include('partials.apk-band')
+    @endunless
 
     <footer class="site-footer--marketing mt-auto hidden border-t border-qaari-border bg-qaari-primary text-qaari-primary-fg md:block">
         <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
