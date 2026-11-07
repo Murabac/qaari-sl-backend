@@ -16,7 +16,7 @@
                         Xulka Quraada (“we”, “us”) provides a website and mobile application for listening to Quranic
                         recitations from the Somali community. This Privacy Policy explains what information we collect,
                         how we use it, and the choices you have. The service is available at
-                        <a href="https://qaari.mahaysaa.com" class="font-semibold text-qaari-primary hover:text-qaari-accent">https://qaari.mahaysaa.com</a>
+                        <a href="https://www.xulkaquraada.com" class="font-semibold text-qaari-primary hover:text-qaari-accent">https://www.xulkaquraada.com</a>
                         and in the Xulka Quraada Android app.
                     </p>
                 </section>
