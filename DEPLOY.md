@@ -1,4 +1,4 @@
-# Qaari SL — Coolify deploy
+# Xulka Quraada — Coolify deploy
 
 Same pattern as Nova and TowerLine: **Dockerfile + FrankenPHP on port 80**, MySQL linked in Coolify, persistent `storage`.
 
@@ -33,7 +33,7 @@ Also:
 Coolify injects `DB_*` when the database is linked. Add the rest. Mark `APP_KEY`, `APP_ENV`, `APP_DEBUG`, `DB_*`, and `AWS_*` as **runtime only** (not available at build).
 
 ```env
-APP_NAME=Qaari SL
+APP_NAME=Xulka Quraada
 APP_ENV=production
 APP_DEBUG=false
 APP_KEY=base64:...
@@ -102,7 +102,7 @@ No cron is required. The entrypoint runs one queue worker.
 
 ## Files this uses
 
-- `Dockerfile` — Composer + Vite + FrankenPHP PHP 8.3, FFmpeg, Python
+- `Dockerfile` — Composer + Vite + FrankenPHP PHP 8.4, FFmpeg, Python
 - `docker/entrypoint.sh` — storage link, caches, migrate, queue worker
 - `public/healthz` — Coolify healthcheck
 - `.dockerignore` — keeps `.env` and `node_modules` out of the image

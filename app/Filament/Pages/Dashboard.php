@@ -12,6 +12,6 @@ class Dashboard extends BaseDashboard
 
     public function getSubheading(): ?string
     {
-        return 'Manage reciters, surahs, and audio for Qaari SL';
+        return 'Manage reciters, surahs, and audio for '.config('app.name');
     }
 }

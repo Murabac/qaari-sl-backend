@@ -66,7 +66,7 @@ class Login extends BaseLogin
             return parent::getSubheading();
         }
 
-        return 'Sign in to the Qaari SL admin panel';
+        return 'Sign in to the '.config('app.name').' admin panel';
     }
 
     protected function getAuthenticateFormAction(): Action

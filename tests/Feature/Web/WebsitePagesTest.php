@@ -19,7 +19,7 @@ class WebsitePagesTest extends TestCase
         $reciter = $this->makeReciter(['name_english' => 'Website Reciter']);
         $this->makeRecitation($reciter, status: RecitationStatus::Approved);
 
-        $this->get('/')->assertOk()->assertSee('Xulka Quraa&#039;da', false);
+        $this->get('/')->assertOk()->assertSee('Xulka Quraada', false);
         $this->get('/reciters')->assertOk()->assertSee('Website Reciter', false);
         $this->get('/reciters/'.$reciter->id)->assertOk()->assertSee('Website Reciter', false);
         $this->get('/story')->assertOk()->assertSee('The Story So Far', false);

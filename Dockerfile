@@ -17,7 +17,7 @@ RUN npm ci
 COPY --from=vendor /app /app
 RUN npm run build
 
-FROM dunglas/frankenphp:1-php8.3
+FROM dunglas/frankenphp:1-php8.4
 WORKDIR /app
 
 # install-php-extensions purges apt packages, so curl/ffmpeg/python come after it.

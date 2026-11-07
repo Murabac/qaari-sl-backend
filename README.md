@@ -1,6 +1,6 @@
-# Qaari SL Backend
+# Xulka Quraada Backend
 
-Laravel 12 API + Filament admin + public Blade website for the Qaari SL Quran reciters platform.
+Laravel 12 API + Filament admin + public Blade website for the Xulka Quraada Quran reciters platform.
 
 ## Stack
 
