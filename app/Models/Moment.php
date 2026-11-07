@@ -24,6 +24,8 @@ class Moment extends Model
         'height',
         'file_size',
         'likes_count',
+        'saves_count',
+        'comments_count',
         'status',
         'submitted_at',
         'reviewed_at',
@@ -40,6 +42,8 @@ class Moment extends Model
             'height' => 'integer',
             'file_size' => 'integer',
             'likes_count' => 'integer',
+            'saves_count' => 'integer',
+            'comments_count' => 'integer',
             'status' => MomentStatus::class,
             'submitted_at' => 'datetime',
             'reviewed_at' => 'datetime',
@@ -69,6 +73,16 @@ class Moment extends Model
     public function likes(): HasMany
     {
         return $this->hasMany(MomentLike::class);
+    }
+
+    public function saves(): HasMany
+    {
+        return $this->hasMany(MomentSave::class);
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(MomentComment::class);
     }
 
     public function likedByUsers(): BelongsToMany

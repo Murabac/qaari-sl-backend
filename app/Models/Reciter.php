@@ -31,6 +31,11 @@ class Reciter extends Model
         return $this->hasMany(Recitation::class)->approved();
     }
 
+    public function followers(): HasMany
+    {
+        return $this->hasMany(ReciterFollow::class);
+    }
+
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

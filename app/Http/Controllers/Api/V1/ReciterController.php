@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ReciterResource;
 use App\Models\Reciter;
+use App\Models\ReciterFollow;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -42,7 +44,47 @@ class ReciterController extends Controller
         );
 
         $reciter->loadCount('approvedRecitations');
+        $this->markFollowed($reciter, request()->user());
 
         return new ReciterResource($reciter);
+    }
+
+    public function follow(Request $request, Reciter $reciter): JsonResponse
+    {
+        ReciterFollow::query()->firstOrCreate([
+            'user_id' => $request->user()->id,
+            'reciter_id' => $reciter->id,
+        ]);
+
+        $this->markFollowed($reciter, $request->user());
+
+        return response()->json([
+            'data' => (new ReciterResource($reciter))->resolve(),
+        ]);
+    }
+
+    public function unfollow(Request $request, Reciter $reciter): JsonResponse
+    {
+        ReciterFollow::query()
+            ->where('user_id', $request->user()->id)
+            ->where('reciter_id', $reciter->id)
+            ->delete();
+
+        $this->markFollowed($reciter, $request->user());
+
+        return response()->json([
+            'data' => (new ReciterResource($reciter))->resolve(),
+        ]);
+    }
+
+    private function markFollowed(Reciter $reciter, mixed $user): void
+    {
+        $reciter->setAttribute(
+            'followed',
+            $user !== null && ReciterFollow::query()
+                ->where('user_id', $user->id)
+                ->where('reciter_id', $reciter->id)
+                ->exists(),
+        );
     }
 }

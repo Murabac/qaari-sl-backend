@@ -39,6 +39,11 @@ class MomentResource extends JsonResource
             'height' => $this->height,
             'likes_count' => (int) $this->likes_count,
             'liked' => (bool) ($this->liked ?? false),
+            'saves_count' => (int) ($this->saves_count ?? 0),
+            'saved' => (bool) ($this->saved ?? false),
+            'comments_count' => (int) ($this->comments_count ?? 0),
+            'followed_reciter' => (bool) ($this->followed_reciter ?? false),
+            'hashtags' => $this->hashtagsFromCaption($this->caption),
             'status' => $this->status?->value,
             'linked_recitation_id' => $linkedRecitationId,
             'reciter' => $this->whenLoaded(
@@ -51,5 +56,19 @@ class MomentResource extends JsonResource
             ),
             'created_at' => $this->created_at?->toIso8601String(),
         ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function hashtagsFromCaption(?string $caption): array
+    {
+        if ($caption === null || $caption === '') {
+            return [];
+        }
+
+        preg_match_all('/#([\p{L}\p{N}_]+)/u', $caption, $matches);
+
+        return array_values(array_unique($matches[1] ?? []));
     }
 }

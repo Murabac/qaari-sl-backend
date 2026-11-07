@@ -24,6 +24,7 @@ class ReciterResource extends JsonResource
             'bio_english' => $this->bio_english,
             'photo_url' => MediaUrl::temporary('r2', $this->photo_url),
             'region' => $this->region,
+            'followed' => (bool) ($this->followed ?? false),
             'approved_recitations_count' => $this->when(
                 isset($this->approved_recitations_count),
                 fn () => (int) $this->approved_recitations_count,

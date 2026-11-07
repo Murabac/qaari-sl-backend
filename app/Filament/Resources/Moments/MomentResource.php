@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Moments;
 
 use App\Filament\Resources\Moments\Pages\CreateMoment;
+use App\Filament\Resources\Moments\RelationManagers\CommentsRelationManager;
 use App\Filament\Resources\Moments\Pages\EditMoment;
 use App\Filament\Resources\Moments\Pages\ListMoments;
 use App\Filament\Resources\Moments\Schemas\MomentForm;
@@ -60,7 +61,9 @@ class MomentResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            CommentsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

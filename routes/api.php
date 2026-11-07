@@ -74,6 +74,7 @@ Route::prefix('v1')->group(function (): void {
 
     Route::get('moments', [MomentController::class, 'index']);
     Route::get('moments/{moment}', [MomentController::class, 'show']);
+    Route::get('moments/{moment}/comments', [MomentController::class, 'comments']);
 
     Route::get('search', SearchController::class);
     Route::get('story', StoryController::class);
@@ -92,6 +93,12 @@ Route::prefix('v1')->group(function (): void {
 
         Route::post('moments/{moment}/like', [MomentController::class, 'like']);
         Route::delete('moments/{moment}/like', [MomentController::class, 'unlike']);
+        Route::post('moments/{moment}/save', [MomentController::class, 'save']);
+        Route::delete('moments/{moment}/save', [MomentController::class, 'unsave']);
+        Route::post('moments/{moment}/comments', [MomentController::class, 'storeComment']);
+        Route::delete('moments/{moment}/comments/{comment}', [MomentController::class, 'destroyComment']);
+        Route::post('reciters/{reciter}/follow', [ReciterController::class, 'follow']);
+        Route::delete('reciters/{reciter}/follow', [ReciterController::class, 'unfollow']);
 
         Route::get('playlists', [PlaylistController::class, 'index']);
         Route::post('playlists', [PlaylistController::class, 'store']);
