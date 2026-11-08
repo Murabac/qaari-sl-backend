@@ -37,7 +37,8 @@
     <section class="bg-qaari-bg px-4 pb-16 pt-0 md:pt-28 sm:px-6">
         <div class="mx-auto max-w-3xl">
             <header class="qaari-forest-header -mx-4 mb-6 sm:-mx-6 md:hidden">
-                <h1 class="qaari-forest-header__title">{{ __('site.favorites') }}</h1>
+                <h1 class="qaari-forest-header__title">{{ LocaleText::nav('Favorites', 'site.favorites') }}</h1>
+                <p class="mt-1 text-sm font-semibold text-[#E5B54F]">{{ __('site.login_to_save') }}</p>
             </header>
             <div class="mb-8 hidden flex-wrap items-end justify-between gap-4 md:flex">
                 <div>

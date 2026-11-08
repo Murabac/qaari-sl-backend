@@ -1,12 +1,17 @@
 @extends('layouts.app', ['solidHeader' => true])
 
+@php
+    use App\Support\LocaleText;
+@endphp
+
 @section('title', __('site.playlists').' · '.__('site.footer_brand'))
 
 @section('content')
     <section class="bg-qaari-bg px-4 pb-16 pt-0 md:pt-28 sm:px-6">
         <div class="mx-auto max-w-3xl">
             <header class="qaari-forest-header -mx-4 mb-6 sm:-mx-6 md:hidden">
-                <h1 class="qaari-forest-header__title">{{ __('site.playlists') }}</h1>
+                <h1 class="qaari-forest-header__title">{{ LocaleText::nav('Playlists', 'site.playlists') }}</h1>
+                <p class="mt-1 text-sm font-semibold text-[#E5B54F]">{{ __('site.create_playlist') }}</p>
             </header>
             <div class="mb-8 hidden flex-wrap items-end justify-between gap-4 md:flex">
                 <div>

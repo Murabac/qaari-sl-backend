@@ -104,7 +104,7 @@
             </div>
         </div>
 
-        <div class="mx-auto mt-8 max-w-2xl space-y-3" dir="rtl">
+        <div class="-mx-4 mt-8 space-y-3 bg-[#F5F2EA] px-4 py-5 sm:-mx-6 sm:px-6" dir="rtl">
             @forelse ($ayahs as $index => $ayah)
                 <button
                     type="button"
@@ -114,6 +114,7 @@
                     id="ayah-{{ $ayah->number }}"
                     x-on:click="$store.player.seekAyah({{ $index }})"
                 >
+                    <span class="mb-2 block text-left text-[11px] font-bold text-[#E8C882]" dir="ltr" x-show="currentAyah === {{ $index }}" x-cloak>Hadda socda</span>
                     <span class="float-left mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#F5F2EA] text-xs font-extrabold text-[#0D3B2E]" dir="ltr">{{ $ayah->number }}</span>
                     <span>{{ $ayah->text_uthmani }}</span>
                 </button>

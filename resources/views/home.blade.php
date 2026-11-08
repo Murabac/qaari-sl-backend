@@ -13,72 +13,163 @@
         class="qaari-app-home md:hidden"
         x-data="{
             q: '',
+            region: '',
+            ayah: false,
             matches(name, region) {
+                if (this.region && String(region || '') !== this.region) return false;
                 const needle = this.q.trim().toLowerCase();
                 if (! needle) return true;
                 return String(name || '').toLowerCase().includes(needle)
                     || String(region || '').toLowerCase().includes(needle);
             }
         }"
+        x-on:open-daily-ayah.window="ayah = true"
     >
-        <header class="qaari-forest-header qaari-forest-header--home">
+        @php
+            $phoneReciters = $allReciters ?? $featured;
+            $phoneRegions = $phoneReciters->pluck('region')->filter()->unique()->sort()->values();
+            $phoneLocale = LocaleText::locale();
+            $phoneAll = match ($phoneLocale) {
+                'ar' => 'الكل',
+                'so' => 'Dhammaan',
+                default => 'All',
+            };
+            $phoneFeatured = match ($phoneLocale) {
+                'ar' => 'القراء المميزون',
+                'so' => 'Quraada Caanka ah',
+                default => 'Featured Reciters',
+            };
+            $phoneSeeAll = match ($phoneLocale) {
+                'ar' => 'عرض الكل',
+                'so' => 'Arag dhammaan',
+                default => 'See all',
+            };
+            $phoneAllTitle = match ($phoneLocale) {
+                'ar' => 'جميع القراء',
+                'so' => 'Dhammaan Quraada',
+                default => 'All Reciters',
+            };
+            $phoneListen = match ($phoneLocale) {
+                'ar' => 'استمع الآن',
+                'so' => 'Dhageyso hadda',
+                default => 'Listen now',
+            };
+            $phoneSearch = match ($phoneLocale) {
+                'ar' => 'ابحث عن قارئ أو سورة…',
+                'so' => 'Raadi quraa, suurad, gobol...',
+                default => 'Search reciters, surahs, region...',
+            };
+        @endphp
+        <header class="bg-[#08281F] px-4 pb-4 pt-3 text-white">
             <div class="flex items-center gap-3">
                 <img src="{{ asset('images/logo-mark-light.png') }}" alt="" class="h-11 w-11 shrink-0" width="44" height="44">
-                <div class="min-w-0">
-                    <p class="truncate text-sm font-extrabold text-qaari-primary-fg">{{ __('site.footer_brand') }}</p>
-                    <p class="truncate text-xs text-qaari-accent/90">{{ __('site.browse') }}</p>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2">
+                        <p class="truncate text-lg font-extrabold">{{ __('site.footer_brand') }}</p>
+                        <span class="shrink-0 rounded-full bg-[#D4AF37]/20 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wider text-[#F3D082]">TILAWA</span>
+                    </div>
+                    <p class="truncate text-[11px] text-[#A3B8B0]">
+                        @if (LocaleText::locale() === 'ar')
+                            أصوات وتلاوات القراء الصوماليين
+                        @elseif (LocaleText::locale() === 'so')
+                            Akhriska Quraanka Quraada Soomaaliyeed
+                        @else
+                            Somali Quran Reciters Anthology
+                        @endif
+                    </p>
                 </div>
+                <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-[#103D30] text-[#E8C882]" x-on:click="$dispatch('open-daily-ayah')" aria-label="Daily ayah">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5"/><path d="M9 17a3 3 0 0 0 6 0"/></svg>
+                </button>
             </div>
-            <label class="mt-4 block">
+            <label class="relative mt-3 block">
                 <span class="sr-only">{{ __('site.search') }}</span>
+                <svg class="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7A988D]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
                 <input
                     type="search"
                     x-model.debounce.150ms="q"
-                    placeholder="{{ __('site.search_placeholder') }}"
-                    class="w-full rounded-2xl border-0 bg-[#ede9df] px-4 py-3 text-sm font-semibold text-qaari-primary outline-none ring-0 placeholder:text-[#6B7B72]"
+                    placeholder="{{ $phoneSearch }}"
+                    class="w-full rounded-xl border border-white/10 bg-[#0F352A] py-2.5 ps-10 pe-3 text-sm text-white outline-none placeholder:text-[#7A988D]"
                     dir="{{ LocaleText::isRtl() ? 'rtl' : 'ltr' }}"
                 >
             </label>
         </header>
 
-        <div class="bg-qaari-bg px-4 pb-6 pt-5">
+        <div class="bg-[#F5F2EA] px-4 pb-6 pt-5">
+            <div x-show="ayah" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6" x-on:click.self="ayah = false">
+                <div class="w-full max-w-sm rounded-2xl bg-[#FAF8F3] p-6 text-center">
+                    <p class="font-arabic text-2xl text-[#0D3B2E]" dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+                    <p class="font-arabic mt-3 text-xl text-[#0D3B2E]" dir="rtl">الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ</p>
+                    <button type="button" class="mt-4 text-sm font-extrabold text-[#0D3B2E]" x-on:click="ayah = false">OK</button>
+                </div>
+            </div>
+            @if ($phoneRegions->isNotEmpty())
+                <div class="mb-4 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    <button type="button" class="shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold" x-bind:class="region === '' ? 'bg-[#0D3B2E] text-white' : 'border border-slate-200 bg-white text-[#0D3B2E]'" x-on:click="region = ''">{{ $phoneAll }}</button>
+                    @foreach ($phoneRegions as $phoneRegion)
+                        <button type="button" class="shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold" x-bind:class="region === @js($phoneRegion) ? 'bg-[#0D3B2E] text-white' : 'border border-slate-200 bg-white text-[#0D3B2E]'" x-on:click="region = @js($phoneRegion)">{{ $phoneRegion }}</button>
+                    @endforeach
+                </div>
+            @endif
             @if ($featured->isNotEmpty())
-                <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-qaari-accent">{{ __('site.featured') }}</p>
-                <div class="mb-6 flex gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div class="mb-3 flex items-center justify-between">
+                    <h2 class="flex items-center gap-1.5 text-base font-extrabold text-[#0D3B2E]">
+                        <svg class="h-4 w-4 text-[#B88E2D]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.6 5.2L19 9l-5.4 1.8L12 16l-1.6-5.2L5 9l5.4-1.8z"/></svg>
+                        {{ $phoneFeatured }}
+                    </h2>
+                    <a href="#all-reciters" class="text-xs font-bold text-[#B88E2D]">{{ $phoneSeeAll }}</a>
+                </div>
+                <div class="mb-6 flex gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     @foreach ($featured as $reciter)
                         @php $photo = LocaleText::portrait($reciter) ?: MediaUrl::temporary('r2', $reciter->photo_url); @endphp
                         <a
                             href="{{ route('reciters.show', $reciter) }}"
-                            class="w-44 shrink-0 overflow-hidden rounded-3xl bg-white shadow-[0_6px_24px_rgba(8,40,31,0.18)] ring-1 ring-qaari-border"
-                            x-show="matches(@js(LocaleText::reciterName($reciter)), @js($reciter->region))"
+                            class="relative h-80 w-56 shrink-0 overflow-hidden rounded-3xl shadow-md"
+                            x-show="matches(@js(LocaleText::reciterName($reciter).' '.LocaleText::reciterBio($reciter)), @js($reciter->region))"
                         >
-                            <div class="aspect-[3/4] bg-[#08281F]">
-                                @if ($photo)
-                                    <img src="{{ $photo }}" alt="" class="h-full w-full object-cover">
-                                @endif
-                            </div>
-                            <div class="p-3">
-                                <p class="truncate text-sm font-extrabold text-qaari-primary">{{ LocaleText::reciterName($reciter) }}</p>
-                                <p class="truncate text-[11px] font-semibold text-[#6B7B72]">
-                                    {{ __('site.surahs_available', ['count' => $reciter->approved_recitations_count]) }}
-                                </p>
+                            @if ($photo)
+                                <img src="{{ $photo }}" alt="" class="h-full w-full object-cover">
+                            @endif
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/20"></div>
+                            @if ($reciter->region)
+                                <span class="absolute start-3.5 top-3.5 rounded-md bg-[#DFB76C]/90 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#07241C]">{{ $reciter->region }}</span>
+                            @endif
+                            <span class="absolute end-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#0D3B2E]">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.4-7-9.2A4 4 0 0 1 12 8a4 4 0 0 1 7 2.8C19 15.6 12 20 12 20z"/></svg>
+                            </span>
+                            <div class="absolute inset-x-4 bottom-4 text-white">
+                                <p class="text-base font-extrabold leading-snug">{{ LocaleText::reciterName($reciter) }}</p>
+                                <p class="mt-0.5 text-xs text-[#E8C882]">{{ $reciter->approved_recitations_count }} {{ $phoneLocale === 'so' ? 'suuradood' : __('site.surahs') }} · Tilawa</p>
+                                <span class="mt-2 inline-flex items-center gap-1 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-xs font-bold">
+                                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                    {{ $phoneListen }}
+                                </span>
                             </div>
                         </a>
                     @endforeach
                 </div>
             @endif
 
-            <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-qaari-accent">{{ __('site.all_reciters') }}</p>
+            <div id="all-reciters" class="mb-3 flex items-center justify-between">
+                <h2 class="flex items-center gap-1.5 text-base font-extrabold text-[#0D3B2E]">
+                    <svg class="h-4 w-4 text-[#B88E2D]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 3a12 12 0 0 1 0 18M12 3a12 12 0 0 0 0 18M3 12h18"/></svg>
+                    {{ $phoneAllTitle }}
+                </h2>
+                <span class="text-[11px] font-semibold text-slate-500">{{ $phoneReciters->count() }} Available</span>
+            </div>
             @if (($allReciters ?? $featured)->isEmpty())
                 <p class="text-sm text-qaari-muted">{{ __('site.no_reciters') }}</p>
             @else
-                <ul class="space-y-2">
+                <ul class="space-y-3">
                     @foreach (($allReciters ?? $featured) as $reciter)
-                        @php $photo = LocaleText::portrait($reciter) ?: MediaUrl::temporary('r2', $reciter->photo_url); @endphp
-                        <li x-show="matches(@js(LocaleText::reciterName($reciter)), @js($reciter->region))">
+                        @php
+                            $photo = LocaleText::portrait($reciter) ?: MediaUrl::temporary('r2', $reciter->photo_url);
+                            $bio = LocaleText::reciterBio($reciter);
+                        @endphp
+                        <li x-show="matches(@js(LocaleText::reciterName($reciter).' '.($bio ?? '')), @js($reciter->region))">
                             <a
                                 href="{{ route('reciters.show', $reciter) }}"
-                                class="flex items-center gap-3 rounded-2xl bg-white px-3 py-2.5 shadow-[0_2px_14px_rgba(8,40,31,0.07)] ring-1 ring-qaari-border"
+                                class="flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-sm"
                             >
                                 <div class="h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-[#08281F]">
                                     @if ($photo)
@@ -86,15 +177,18 @@
                                     @endif
                                 </div>
                                 <div class="min-w-0 flex-1">
-                                    <p class="truncate text-sm font-extrabold text-qaari-primary">{{ LocaleText::reciterName($reciter) }}</p>
-                                    <p class="truncate text-xs font-semibold text-[#6B7B72]">
+                                    <p class="truncate text-sm font-extrabold text-slate-900">{{ LocaleText::reciterName($reciter) }}</p>
+                                    @if ($bio)
+                                        <p class="truncate text-xs text-slate-500">{{ $bio }}</p>
+                                    @endif
+                                    <p class="mt-1 text-xs font-semibold text-[#B88E2D]">
+                                        {{ $reciter->approved_recitations_count }} {{ __('site.surahs') }}
                                         @if ($reciter->region)
-                                            {{ $reciter->region }} ·
+                                            · {{ $reciter->region }}
                                         @endif
-                                        {{ __('site.surahs_available', ['count' => $reciter->approved_recitations_count]) }}
                                     </p>
                                 </div>
-                                <svg class="h-5 w-5 shrink-0 text-qaari-accent {{ LocaleText::isRtl() ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                <svg class="h-5 w-5 shrink-0 text-slate-300 {{ LocaleText::isRtl() ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                             </a>
                         </li>
                     @endforeach

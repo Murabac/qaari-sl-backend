@@ -10,7 +10,7 @@
 @section('content')
     <section class="qaari-app-page bg-qaari-bg">
         <header class="qaari-forest-header">
-            <h1 class="qaari-forest-header__title">{{ __('site.settings') }}</h1>
+            <h1 class="qaari-forest-header__title text-[1.7rem]">{{ LocaleText::nav('Settings', 'site.settings') }}</h1>
         </header>
 
         <div class="mx-auto max-w-lg space-y-6 px-4 py-6 sm:px-6">

@@ -16,19 +16,20 @@
 @section('content')
     <section class="min-h-screen bg-[#08281F] px-4 pb-8 pt-4 text-[#F5F2EA] md:pt-28" x-data>
         <div class="mx-auto max-w-lg">
-            <header class="mb-4 flex items-center gap-3">
-                <img src="{{ asset('images/logo-mark-light.png') }}" alt="" class="h-10 w-10" width="40" height="40">
-                <h1 class="text-lg font-extrabold">{{ LocaleText::nav('Moments', 'site.moments') }}</h1>
-            </header>
+            <div class="mb-4 flex items-center justify-between gap-3">
+                <h1 class="font-display text-3xl font-bold tracking-tight">{{ LocaleText::nav('Moments', 'site.moments') }}</h1>
+                <span class="shrink-0 rounded-full bg-[#D4AF37]/20 px-2.5 py-1 text-[11px] font-bold text-[#E8C882]">Quran Shorts</span>
+            </div>
 
-            <form method="GET" action="{{ route('moments.index') }}" class="mb-4">
+            <form method="GET" action="{{ route('moments.index') }}" class="relative mb-4">
                 <input type="hidden" name="filter" value="{{ $filter }}">
+                <svg class="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7A988D]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
                 <input
                     type="search"
                     name="q"
                     value="{{ $search }}"
                     placeholder="{{ __('site.moments_search') }}"
-                    class="w-full rounded-2xl border-0 bg-white/10 px-4 py-3 text-sm font-semibold text-[#F5F2EA] outline-none placeholder:text-[#A2B5AA]"
+                    class="w-full rounded-2xl border border-white/10 bg-[#0F352A] py-2.5 ps-10 pe-3 text-sm text-[#F5F2EA] outline-none placeholder:text-[#7A988D]"
                 >
             </form>
 
@@ -36,8 +37,8 @@
                 @foreach ($filters as $key => $label)
                     <a
                         href="{{ route('moments.index', array_filter(['filter' => $key, 'q' => $search])) }}"
-                        class="shrink-0 rounded-full px-3 py-1.5 text-xs font-extrabold {{ $filter === $key ? 'bg-[#E5B54F] text-[#08281F]' : 'bg-white/10 text-[#F3D082]' }}"
-                    >{{ $label }}</a>
+                        class="inline-flex shrink-0 items-center gap-1 rounded-xl border px-3.5 py-1.5 text-xs font-extrabold {{ $filter === $key ? 'border-[#E5B54F] bg-[#E5B54F] text-[#07241C]' : 'border-white/10 bg-[#0A261E] text-[#F5F2EA]' }}"
+                    >@if ($filter === $key) <span>✓</span> @endif{{ $label }}</a>
                 @endforeach
             </div>
 
@@ -60,24 +61,18 @@
                             $liked = (bool) ($moment->liked ?? false);
                             $saved = (bool) ($moment->saved ?? false);
                         @endphp
-                        <article class="overflow-hidden rounded-3xl bg-[#0D3B2E] ring-1 ring-white/10">
-                            <div class="flex items-center gap-3 px-4 py-3">
-                                <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[#08281F]">
-                                    @if ($moment->reciter && LocaleText::portrait($moment->reciter))
-                                        <img src="{{ LocaleText::portrait($moment->reciter) }}" alt="" class="h-full w-full object-cover">
-                                    @else
-                                        <img src="{{ asset('images/logo-mark-light.png') }}" alt="" class="h-6 w-6">
-                                    @endif
-                                </div>
-                                <div class="min-w-0">
-                                    <p class="truncate text-sm font-extrabold">{{ $name }}</p>
+                        <article class="overflow-hidden rounded-3xl border border-[#D4AF37]/25 bg-[#092B22] text-white shadow-xl">
+                            <div class="px-5 pb-2.5 pt-4">
+                                <h2 class="text-base font-extrabold leading-snug">{{ $moment->title ?: $name }}</h2>
+                                <p class="text-xs font-medium text-[#E8C882]">
+                                    {{ $name }}
                                     @if ($moment->surah)
-                                        <p class="truncate text-xs text-[#F3D082]">{{ LocaleText::surahName($moment->surah) }}</p>
+                                        · {{ LocaleText::surahName($moment->surah) }}
                                     @endif
-                                </div>
+                                </p>
                             </div>
                             @if ($video)
-                                <div class="bg-black" style="aspect-ratio: {{ $ratio }};">
+                                <div class="mx-3 overflow-hidden rounded-2xl bg-black" style="aspect-ratio: {{ $ratio }};">
                                     <video
                                         class="h-full w-full object-contain"
                                         src="{{ $video }}"
@@ -88,31 +83,31 @@
                                     ></video>
                                 </div>
                             @endif
-                            <div class="space-y-3 px-4 py-3">
-                                @if ($moment->title)
-                                    <p class="text-sm font-extrabold">{{ $moment->title }}</p>
-                                @endif
-                                @if ($moment->caption)
-                                    <p class="text-sm leading-relaxed text-[#F5F2EA]/90">{{ $moment->caption }}</p>
-                                @endif
-                                <div class="flex items-center gap-3 text-xs font-extrabold text-[#F3D082]">
-                                    @auth
-                                        <form method="POST" action="{{ $liked ? route('moments.unlike', $moment) : route('moments.like', $moment) }}">
-                                            @csrf
-                                            @if ($liked) @method('DELETE') @endif
-                                            <button type="submit">{{ $moment->likes_count }} ♥</button>
-                                        </form>
-                                        <form method="POST" action="{{ $saved ? route('moments.unsave', $moment) : route('moments.save', $moment) }}">
-                                            @csrf
-                                            @if ($saved) @method('DELETE') @endif
-                                            <button type="submit">{{ $saved ? __('site.moments_saved') : __('site.moments_saved') }} {{ $moment->saves_count }}</button>
-                                        </form>
-                                    @else
-                                        <a href="{{ route('login') }}">{{ $moment->likes_count }} ♥</a>
-                                        <a href="{{ route('login') }}">{{ $moment->saves_count }}</a>
-                                    @endauth
-                                    <span>{{ $moment->comments_count }} {{ __('site.moments_comment') }}</span>
+                            <div class="space-y-3 px-5 py-3">
+                                <div class="flex items-center justify-between border-b border-white/10 pb-3 text-xs font-semibold">
+                                    <div class="flex items-center gap-5">
+                                        @auth
+                                            <form method="POST" action="{{ $liked ? route('moments.unlike', $moment) : route('moments.like', $moment) }}">
+                                                @csrf
+                                                @if ($liked) @method('DELETE') @endif
+                                                <button type="submit" class="{{ $liked ? 'text-[#E5B54F]' : '' }}">♥ {{ $moment->likes_count }}</button>
+                                            </form>
+                                            <form method="POST" action="{{ $saved ? route('moments.unsave', $moment) : route('moments.save', $moment) }}">
+                                                @csrf
+                                                @if ($saved) @method('DELETE') @endif
+                                                <button type="submit" class="{{ $saved ? 'text-[#E5B54F]' : '' }}">▣ {{ __('site.moments_saved') }}</button>
+                                            </form>
+                                        @else
+                                            <a href="{{ route('login') }}">♥ {{ $moment->likes_count }}</a>
+                                            <a href="{{ route('login') }}">▣ {{ __('site.moments_saved') }}</a>
+                                        @endauth
+                                        <span>💬 {{ $moment->comments_count }}</span>
+                                    </div>
+                                    <span class="text-[#E8C882]">♪ {{ __('site.moments_sound') }}</span>
                                 </div>
+                                @if ($moment->caption)
+                                    <p class="text-xs leading-relaxed text-[#D2E4DC]">{{ $moment->caption }}</p>
+                                @endif
                                 @auth
                                     <form method="POST" action="{{ route('moments.comment', $moment) }}" class="flex gap-2">
                                         @csrf

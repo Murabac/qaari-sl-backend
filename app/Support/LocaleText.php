@@ -53,9 +53,9 @@ class LocaleText
             str_contains($haystack, 'alafasy')
             || str_contains($haystack, 'mishary')
             || str_contains($haystack, 'cafaasi')
-            || str_contains($haystack, 'abdilahi')
-            || str_contains($haystack, 'cabdilaahi')
         ) {
+            $file = 'mishary_alafasy.jpg';
+        } elseif (str_contains($haystack, 'abdilahi') || str_contains($haystack, 'cabdilaahi')) {
             $file = 'sheikh_abdilahi.jpg';
         } elseif (
             str_contains($haystack, 'hussary')

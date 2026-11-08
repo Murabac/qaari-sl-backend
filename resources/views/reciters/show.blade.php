@@ -40,10 +40,48 @@
 @endsection
 
 @section('content')
-    <section class="qaari-reciter-hero relative overflow-hidden bg-qaari-primary pt-28 pb-16 text-qaari-primary-fg">
+    @php $portrait = LocaleText::portrait($reciter); $cover = $portrait ?: $photoUrl; @endphp
+    <section class="md:hidden bg-[#F5F2EA]">
+        <div class="relative h-80 bg-[#08281F]">
+            @if ($cover)
+                <img src="{{ $cover }}" alt="" class="h-full w-full object-cover object-top">
+            @endif
+            <div class="absolute inset-0 bg-gradient-to-t from-[#F5F2EA] from-[18%] via-[#F5F2EA]/85 via-[42%] to-transparent"></div>
+            <a href="{{ route('reciters.index') }}" class="absolute start-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-[#0D3B2E] text-white">
+                <svg class="h-5 w-5 {{ LocaleText::isRtl() ? 'rotate-180' : '' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+            </a>
+            <div class="absolute inset-x-5 bottom-2 flex items-center gap-3">
+                <div class="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-[#08281F] ring-[3px] ring-[#F5F2EA]">
+                    @if ($cover)
+                        <img src="{{ $cover }}" alt="" class="h-full w-full object-cover">
+                    @endif
+                </div>
+                <div class="min-w-0">
+                    <h1 class="text-xl font-extrabold leading-tight text-[#10241C]">{{ LocaleText::reciterName($reciter) }}</h1>
+                    @if ($reciter->region)
+                        <p class="text-sm font-bold text-[#B88E2D]">{{ $reciter->region }}</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-3 bg-white py-4 text-center">
+            <div>
+                <p class="text-base font-extrabold text-[#0D3B2E]">{{ $tracks->count() }}</p>
+                <p class="text-[10px] font-extrabold tracking-wider text-slate-500">{{ LocaleText::locale() === 'so' ? 'SUURADOOD' : __('site.surahs') }}</p>
+            </div>
+            <div class="border-x border-slate-200">
+                <p class="truncate px-2 text-base font-extrabold text-[#0D3B2E]">{{ $reciter->region ?: '—' }}</p>
+                <p class="text-[10px] font-extrabold tracking-wider text-slate-500">{{ LocaleText::locale() === 'so' ? 'GOBOLKA' : __('site.region') }}</p>
+            </div>
+            <div>
+                <p class="text-base font-extrabold text-[#0D3B2E]">Tilawa</p>
+                <p class="text-[10px] font-extrabold tracking-wider text-slate-500">{{ LocaleText::locale() === 'so' ? 'QAABKA' : __('site.style') }}</p>
+            </div>
+        </div>
+    </section>
+    <section class="qaari-reciter-hero relative hidden overflow-hidden bg-qaari-primary pt-28 pb-16 text-qaari-primary-fg md:block">
         <div class="qaari-pattern-gold absolute inset-0 opacity-80"></div>
         <div class="relative mx-auto flex max-w-7xl flex-col gap-8 px-4 sm:flex-row sm:items-end sm:px-6">
-            @php $portrait = LocaleText::portrait($reciter); @endphp
             <div class="h-40 w-40 shrink-0 overflow-hidden rounded-2xl bg-qaari-deep ring-1 ring-white/10 sm:h-48 sm:w-48">
                 @if ($portrait)
                     <img src="{{ $portrait }}" alt="" class="h-full w-full object-cover md:hidden">
@@ -141,7 +179,7 @@
                                             disabled
                                         @endif
                                     >
-                                        <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-qaari-primary text-qaari-primary-fg">
+                                        <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#D4AF37] text-[#08281F]">
                                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                                         </span>
                                         <span class="min-w-0 flex-1">
