@@ -14,6 +14,13 @@ class WebsitePagesTest extends TestCase
     use CreatesCatalogData;
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['moments.enabled' => true]);
+    }
+
     public function test_phone_moments_page_and_somali_nav_labels(): void
     {
         $this->get('/moments')->assertOk()->assertSee('Moments', false);
@@ -22,7 +29,24 @@ class WebsitePagesTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('Moments', false)
-            ->assertDontSee('Dhaqdho', false);
+            ->assertDontSee('Dhaqdho', false)
+            ->assertSee(route('moments.index'), false);
+    }
+
+    public function test_moments_page_and_links_are_hidden_when_disabled(): void
+    {
+        config(['moments.enabled' => false]);
+
+        $this->get('/moments')->assertNotFound();
+
+        $this->get('/')
+            ->assertOk()
+            ->assertDontSee(route('moments.index'), false)
+            ->assertDontSee('is-moments', false)
+            ->assertSee(route('home'), false)
+            ->assertSee('Favorites', false)
+            ->assertSee('Playlists', false)
+            ->assertSee('Settings', false);
     }
 
     public function test_home_and_reciters_pages_render(): void

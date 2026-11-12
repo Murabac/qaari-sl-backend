@@ -128,6 +128,9 @@
         </div>
 
         <div class="qaari-web-player__body">
+            <div class="qaari-web-player__thumb" aria-hidden="true">
+                <span x-text="(($store.player.track?.title || 'ق').trim().charAt(0)) || 'ق'"></span>
+            </div>
             <button
                 type="button"
                 class="qaari-web-player__meta text-start"
@@ -149,7 +152,7 @@
                 >
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
                 </button>
-                <button type="button" class="qaari-web-player__skip hidden sm:inline-flex" x-on:click="$store.player.skip(-10)">
+                <button type="button" class="qaari-web-player__skip qaari-web-player__nudge hidden sm:inline-flex" x-on:click="$store.player.skip(-10)">
                     {{ __('site.skip_back') }}
                 </button>
                 <button
@@ -161,12 +164,12 @@
                     <svg x-show="! $store.player.playing" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                     <svg x-show="$store.player.playing" x-cloak class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
                 </button>
-                <button type="button" class="qaari-web-player__skip" x-on:click="$store.player.skip(10)">
+                <button type="button" class="qaari-web-player__skip qaari-web-player__nudge" x-on:click="$store.player.skip(10)">
                     {{ __('site.skip_forward') }}
                 </button>
                 <button
                     type="button"
-                    class="qaari-web-player__skip hidden sm:inline-flex"
+                    class="qaari-web-player__skip qaari-web-player__next"
                     x-on:click="$store.player.playNext()"
                     x-bind:disabled="! $store.player.hasNext()"
                     x-bind:class="{ 'opacity-30 pointer-events-none': ! $store.player.hasNext() }"
@@ -177,14 +180,14 @@
                 </button>
             </div>
 
-            <div class="qaari-web-player__time">
+            <div class="qaari-web-player__time qaari-web-player__extra">
                 <span x-text="$store.player.format($store.player.current)"></span>
                 /
                 <span x-text="$store.player.format($store.player.duration)"></span>
             </div>
 
             <a
-                class="inline-flex min-h-9 shrink-0 items-center rounded-full border border-white/15 px-2.5 py-1 text-[0.65rem] font-semibold text-qaari-accent transition hover:border-qaari-accent"
+                class="qaari-web-player__extra inline-flex min-h-9 shrink-0 items-center rounded-full border border-white/15 px-2.5 py-1 text-[0.65rem] font-semibold text-qaari-accent transition hover:border-qaari-accent"
                 x-show="$store.player.track?.followUrl"
                 x-cloak
                 x-bind:href="$store.player.track?.followUrl || '#'"
@@ -193,13 +196,13 @@
 
             <button
                 type="button"
-                class="hidden rounded-full border border-white/15 px-2.5 py-1 text-[0.65rem] font-semibold text-white/70 transition hover:border-white/40 hover:text-white sm:inline"
+                class="qaari-web-player__extra hidden rounded-full border border-white/15 px-2.5 py-1 text-[0.65rem] font-semibold text-white/70 transition hover:border-white/40 hover:text-white sm:inline"
                 x-on:click="$store.player.share()"
             >{{ __('site.share') }}</button>
 
             <button
                 type="button"
-                class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-white/40 hover:text-white"
+                class="qaari-web-player__extra inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-white/40 hover:text-white"
                 x-on:click="$store.player.close()"
                 aria-label="{{ __('site.close_player') }}"
                 title="{{ __('site.close_player') }}"

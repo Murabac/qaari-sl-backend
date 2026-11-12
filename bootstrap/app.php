@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureMomentsEnabled;
 use App\Http\Middleware\EnsureStaffUser;
 use App\Http\Middleware\SetLocale;
 use App\Support\LastExceptionProbe;
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'staff' => EnsureStaffUser::class,
+            'moments' => EnsureMomentsEnabled::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -35,6 +35,16 @@ class MomentResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Moments';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return config('moments.enabled') && parent::shouldRegisterNavigation();
+    }
+
+    public static function canAccess(): bool
+    {
+        return config('moments.enabled') && parent::canAccess();
+    }
+
     public static function form(Schema $schema): Schema
     {
         return MomentForm::configure($schema);

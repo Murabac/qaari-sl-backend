@@ -63,6 +63,9 @@ RUN_MIGRATIONS=true
 RUN_QUEUE=true
 AYAH_SYNC_AUTO=true
 AYAH_SYNC_PYTHON=python
+
+# Hide Moments until the redesigned app ships. Old apps still get an empty list.
+MOMENTS_ENABLED=false
 ```
 
 Generate `APP_KEY` in Coolify, or locally with `php artisan key:generate --show`. If this replaces the existing production app, keep the **current** `APP_KEY` so sessions stay valid.
@@ -72,6 +75,8 @@ Copy `AWS_*` from the existing Coolify app or your local `.env`. Do not commit t
 `APP_URL` must be the public **https** URL. `LIVEWIRE_TEMPORARY_FILE_UPLOAD_DISK` stays `local` so Filament uploads go through Laravel instead of the browser talking to R2.
 
 `DB_QUEUE_RETRY_AFTER` must stay above the ayah-sync job timeout (600 seconds). The default in `config/queue.php` is already 900.
+
+`MOMENTS_ENABLED` is a Coolify runtime env var. Leave it `false` so Moments stays off the website, the admin panel, and the APIs. `GET /api/v1/moments` still returns an empty paginated list for apps already in the wild. To bring Moments back later, set `MOMENTS_ENABLED=true`, run `php artisan config:clear`, and redeploy.
 
 ## First deploy
 

@@ -13,12 +13,17 @@ use App\Models\ReciterFollow;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class MomentController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection|JsonResponse
     {
+        if (! config('moments.enabled')) {
+            return $this->emptyIndex($request);
+        }
+
         $filter = (string) $request->string('filter', 'latest');
         $user = $request->user();
 
@@ -75,6 +80,23 @@ class MomentController extends Controller
         }
 
         return MomentResource::collection($moments);
+    }
+
+    private function emptyIndex(Request $request): AnonymousResourceCollection
+    {
+        $perPage = min(max((int) $request->integer('per_page', 20), 1), 50);
+        $paginator = new LengthAwarePaginator(
+            [],
+            0,
+            $perPage,
+            LengthAwarePaginator::resolveCurrentPage(),
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ],
+        );
+
+        return MomentResource::collection($paginator);
     }
 
     public function show(Moment $moment): MomentResource

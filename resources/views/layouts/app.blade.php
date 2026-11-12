@@ -142,7 +142,9 @@
             x-cloak
         >
             <a href="{{ route('home') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ LocaleText::nav('Home', 'site.home') }}</a>
-            <a href="{{ route('moments.index') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ LocaleText::nav('Moments', 'site.moments') }}</a>
+            @if (config('moments.enabled'))
+                <a href="{{ route('moments.index') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ LocaleText::nav('Moments', 'site.moments') }}</a>
+            @endif
             <a href="{{ route('reciters.index') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ __('site.reciters') }}</a>
             <a href="{{ route('story') }}" class="block py-2 text-sm font-semibold text-qaari-primary">{{ __('site.story') }}</a>
             @auth
