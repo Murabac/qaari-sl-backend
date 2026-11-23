@@ -109,7 +109,7 @@ return [
     'share' => 'La wadaag',
     'link_copied' => 'Linkiga waa la koobiyey',
     'share_listen_desc' => 'Dhageyso :surah oo uu akhriyay :reciter ee Xulka Quraada.',
-    'settings' => 'Dejinta',
+    'settings' => 'Settings',
     'account' => 'Akoonka',
     'about' => 'Ku saabsan',
     'download_apk' => 'Soo dejiso app-ka Android',
